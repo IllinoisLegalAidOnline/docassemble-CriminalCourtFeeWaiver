@@ -1797,7 +1797,7 @@ attachments:
     filename: IL_fee_waiver_order
     variable name: IL_fee_waiver_order[i]
     skip undefined: True
-    pdf template file: FW-CIV-Order.pdf
+    pdf template file: waiver_order.pdf
     editable: False
     fields:
       - "trial_court_county": ${ trial_court.address.county }
@@ -1897,7 +1897,7 @@ attachments:
     filename: IL_fee_waiver     
     variable name: IL_fee_waiver_attachment[i]        
     skip undefined: True
-    pdf template file: FeeWaiver_Civil_Application.pdf
+    pdf template file: waiver_application.pdf
     editable: False
     fields:
       - "trial_court_county": ${ trial_court.address.county }
