@@ -18,6 +18,7 @@ code: |
   ilao_easy_form_title = "Criminal Court fee waiver"
   github_repo_name = "docassemble-CriminalCourtFeeWaiver"
   github_user = 'IllinoisLegalAidOnline'
+  user_ask_role = 'defendant'
   form_name = "Application for Waiver of Criminal Court Assessments"
   al_form_type = 'existing_case'
   allowed_courts = ['Circuit']
@@ -83,20 +84,19 @@ code: |
     
   set_progress(50)
   nav.set_section('section_case_info')
-  user_ask_role
+  #user_ask_role
   users.gather()
-  other_parties.gather()  
-  if in_re_check == True:
-    in_re_label
+  #other_parties.gather()  
   docket_number
-  plaintiffs
+  #plaintiffs - test to see if this will work
   defendants
 
   set_progress(75)
   nav.set_section('section_about_you')
   substantial_hardship_explanation
-  users[0].address.address
+  hide_address
   if filing_basis == "filing_self":
+    users[0].address.address
     users[0].has_email_address
   if filing_basis != "filing_self":
     signer[0].address.address
@@ -1489,25 +1489,16 @@ fields:
   - code: |
       other_parties[i].name_fields(person_or_business='unsure')
 ---
-id: in re check
-question: |
- Does the court case have the words "**In re:**" in the name?
-subquestion: |
-  Look at the name of the case at the top of the court papers. "In re" is often used in probate, guardianship, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called "In re: Estate of Jane Doe."
-  
-  **Note:** If the court papers say "In re:" but also list the names of people in the case, you can select **No**. For example, if the case title is "In re: Marriage of Julia Smith and Tony Smith," the names you already entered will be put on your forms. 
-fields:
-  - no label: in_re_check
-    datatype: yesnoradio
 ---
-id: in re label
+id: hide address
 question: |
-  What does it say after "**In re:**" on the court papers?
+    Do you want to keep your address hidden?
 subquestion: |
-  For example, the case could be called "In re: The Will of Elena Black."
-fields:
-  - In re:: in_re_label
-    maxlength: 50
+  You do not need to list where you are staying on your court papers. You can use an address where you can receive court notices instead.
+field: hide_address
+choices:
+  - Yes: True
+  - No: False
 ---
 id: address
 #generic object: ALIndividual
@@ -1517,9 +1508,23 @@ sets:
   - users[0].address.zip
 question: |
   % if filing_basis == "filing_self":
-    What is your address?
+  % if hide_address:
+  What is your mailing address?
   % else:
-    What is ${ users[0].familiar() }'s address?
+  What is your home address?
+  % endif
+  % else:
+  % if hide_address:
+  What is ${ users[0].familiar() }'s mailing address?
+  % else:
+  What is ${ users[0].familiar() }'s home address?
+  % endif
+  % endif
+subquestion: |
+  % if hide_address:
+  **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
+  % else:
+  **This address will appear on your court papers.** If you do not want this, click **Back** to keep this address hidden.
   % endif
 fields:
   - Street address: users[0].address.address
@@ -1540,7 +1545,17 @@ sets:
   - signer[0].address.city
   - signer[0].address.zip
 question: |
-  What is your address?
+  % if hide_address:
+  What is your mailing address?
+  % else:
+  What is your home address?
+  % endif
+subquestion: |
+  % if hide_address:
+  **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
+  % else:
+  **This address will appear on your court papers.** If you do not want this, click **Back** to keep your address hidden.
+  % endif
 fields:
   - Street address: signer[0].address.address
     address autocomplete: True
@@ -1801,26 +1816,7 @@ attachments:
     editable: False
     fields:
       - "trial_court_county": ${ trial_court.address.county }
-      - "plaintiff": |
-          % if in_re_check:
-          ${ in_re_label }
-          % else:
-          % if plaintiffs.number() > 1:
-          ${ plaintiffs[0].name.full(middle="full") }, et al.
-          % else:
-          ${ plaintiffs[0].name.full(middle="full") }
-          % endif
-          % endif
-      - "defendant": |
-          % if in_re_check:
-          ${ "" }
-          % else:
-          % if defendants.number() > 1:
-          ${ defendants[0].name.full(middle="full") }, et al.
-          % else:
-          ${ defendants[0].name.full(middle="full") }      
-          % endif
-          % endif
+      - "defendant": ${ defendants[0].name.full(middle="full") }      
       - "docket_number": ${ docket_number }
       - "docket_number__1": ${ docket_number }
       - "docket_number__2": ${ docket_number }
@@ -1833,7 +1829,6 @@ attachments:
     pdf template file: winnebago_supplement.pdf
     editable: False
     fields:
-      - "in_re": ${ "In re:" if in_re_check == True else ""} ${ in_re_label if in_re_check == True else ""}
       - "plaintiff": ${ plaintiffs.full_names() }
       - "defendant": ${ defendants.full_names() }
       - "docket_number": ${ docket_number }
@@ -1863,26 +1858,8 @@ attachments:
     pdf template file: kankakee_supplement.pdf
     editable: False
     fields:
-      - "plaintiff": |
-          % if in_re_check:
-          ${ "In re: " + in_re_label }
-          % else:
-          % if plaintiffs.number() > 1:
-          ${ plaintiffs[0].name.full(middle="full") }, et al.
-          % else:
-          ${ plaintiffs[0].name.full(middle="full") }
-          % endif
-          % endif
-      - "defendant": |
-          % if in_re_check:
-          ${ "" }
-          % else:
-          % if defendants.number() > 1:
-          ${ defendants[0].name.full(middle="full") }, et al.
-          % else:
-          ${ defendants[0].name.full(middle="full") }      
-          % endif
-          % endif
+      - "plaintiff": ${ "" }
+      - "defendant": ${ defendants[0].name.full(middle="full") }      
       - "docket_number": ${ docket_number }
       - "signer_signature_slash_s": |
           % if filing_basis != "filing_self":          
@@ -1901,26 +1878,7 @@ attachments:
     editable: False
     fields:
       - "trial_court_county": ${ trial_court.address.county }
-      - "plaintiff": |
-          % if in_re_check:
-          ${ in_re_label }
-          % else:
-          % if plaintiffs.number() > 1:
-          ${ plaintiffs[0].name.full(middle="full") }, et al.
-          % else:
-          ${ plaintiffs[0].name.full(middle="full") }
-          % endif
-          % endif
-      - "defendant": |
-          % if in_re_check:
-          ${ "" }
-          % else:
-          % if defendants.number() > 1:
-          ${ defendants[0].name.full(middle="full") }, et al.
-          % else:
-          ${ defendants[0].name.full(middle="full") }      
-          % endif
-          % endif
+      - "defendant": ${ defendants[0].name.full(middle="full") }      
       - "docket_number": ${ docket_number }
       - "docket_number__1": ${ docket_number }
       - "docket_number__2": ${ docket_number }
@@ -1929,6 +1887,7 @@ attachments:
       - "filing_obo_cb": ${ True if filing_basis != "filing_self" else ""}
       - "user_name_full": ${ users[0].name.full(middle="full") }
       - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
+      - "hide_address": ${ hide_address }
       - "signer_name_full": |
           % if filing_basis != "filing_self":
           ${ signer[0].name.full(middle="full") }
@@ -2599,14 +2558,6 @@ review:
       % for item in defendants:
         * ${ item.name.full(middle="full") }
       % endfor
-  - Edit: in_re_check
-    button: |
-      **Does the court case have "In re:" in the name?**  
-      ${word(yesno(in_re_check))}
-  - Edit: in_re_label
-    button: |
-      **In re:** ${in_re_label}
-    show if: in_re_check
   - Edit: 
       - trial_court_index
       - recompute:
@@ -3272,14 +3223,6 @@ review:
       % for item in defendants:
         * ${ item.name.full(middle="full") }
       % endfor
-  - Edit: in_re_check
-    button: |
-      **Does the court case have "In re:" in the name?**  
-      ${word(yesno(in_re_check))}
-  - Edit: in_re_label
-    button: |
-      **In re:** ${in_re_label}
-    show if: in_re_check
   - Edit: 
       - trial_court_index
       - recompute:
