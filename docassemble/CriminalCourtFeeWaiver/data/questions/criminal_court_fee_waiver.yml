@@ -38,7 +38,7 @@ sections:
   - section_expenses: Expenses
   - section_assets: Assets
   - section_case_info: Court case info
-  - section_about_you: Details about person asking for a fee waiver
+  - section_about_you: Details about person asking for an assessments waiver
   - section_download: Download
 ---
 mandatory: True
@@ -51,7 +51,7 @@ code: |
   accept_terms
   whats_next
   set_progress(10)
-  civil_fee_waiver
+  criminal_court_fee_waiver
   filing_basis
   trial_court.address.address
 
@@ -85,7 +85,7 @@ code: |
   set_progress(50)
   nav.set_section('section_case_info')
   #user_ask_role
-  users.gather()
+  users.gather(number=1)
   #other_parties.gather()  
   docket_number
   #plaintiffs - test to see if this will work
@@ -175,16 +175,18 @@ id: welcome
 question: |
   Criminal Court fee waiver
 subquestion: |
-  Welcome to Illinois Legal Aid Online's **Criminal Court fee waiver** Easy Form. This program creates a form that asks the court to waive or reduce criminal court assessments. You can also use it to ask the court to waive or reduce traffic court assessments in Cook County, Illinois.
+  Welcome to Illinois Legal Aid Online's **Criminal Court fee waiver** Easy Form.
   
-  Learn about [**filing court papers for 
-  free**](https://www.illinoislegalaid.org/legal-information/filing-court-papers-free).
+  This program creates a form that asks the court to waive or reduce criminal court assessments. You can also use it to ask the court to waive or reduce traffic court assessments in Cook County, Illinois.
+  
+  Criminal or traffic court assessments are **costs charged to a defendant in a criminal case once the defendant pleads guilty or is found guilty**. They do not include fines or restitution ordered by the judge to be paid by the defendant. This means that this waiver may not apply to some court costs and fees associated with your case.
+  
 field: sees_nav_bar
 ---
 id: your name
 sets:
-    - users[0].name.first
-    - users[0].name.last
+  - users[0].name.first
+  - users[0].name.last
 question:  |
   % if filing_basis == "filing_self":
   What is your name?
@@ -210,7 +212,7 @@ subquestion: |
 
   If you are filling out this form on behalf of a minor or incompetent adult, you will need that person's information.
 
-  You will also need to know information about the court case for which you are requesting a fee waiver. You can find this information on other court papers you have about this case. 
+  You will also need to know information about the court case for which you are requesting a waiver of assessments. You can find this information on other court papers you have about this case. 
 
   Set aside 10 to 15 minutes to finish this program. You can log in and save your work to return to later. 
  
@@ -229,11 +231,11 @@ continue button field: whats_next
 question: |
   After you finish this program
 subquestion: |
-  After you download your ${ form_name }, you must file it with the court. This program does not file your ${ form_name } for you.
+  After you download your forms, you must file them with the court. This program does not file your forms for you.
   
-  **Note:** You can file your ${ form_name } at any time during your court case. It is usually done when a person files their first forms in a case. That way they might have all of the court fees in a case waived.
+  **Note:** in criminal and traffic cases you must file an Application for Waiver of Criminal Court Assessments **no later than 30 days after the sentencing date**. You are responsible for knowing if there are other deadlines to file the documents.
   
-  To learn more, read the "How to Request a Fee Waiver (Civil)" instructions you can download at the end of this program. 
+  To learn more, read the instructions you can download at the end of this program. 
 ---
 template: get_legal_help
 subject: |
@@ -243,16 +245,18 @@ content: |
   
   Use [**Get Legal Help**](https://www.illinoislegalaid.org/get-legal-help) to find free or low-cost legal services in your area.
 ---
-id: civil circuit court only
-continue button field: civil_fee_waiver
+id: criminal and traffic court only
+continue button field: criminal_court_fee_waiver
 question: |
-  Civil fee waiver for Circuit Court 
+  Criminal or traffic assessments waiver for Circuit Court cases
 subquestion: |
-  You can use this program to make Fee waiver forms if you have a **civil case** in Circuit Court. For example, divorce cases, family cases, eviction cases, small claims cases, foreclosure cases, and lawsuits for injury or property damage. You can also use this fee waiver if you are asking the judge to expunge or seal a criminal case.
+  You can use this program to make assessments waiver forms if you have a **criminal case** in Circuit Court.
+  
+  You can also use this program if you have assessments in Cook County for **traffic and petty offenses** in Schedules 2, 6, 9, 10, and 13 of [Article 15 of the Criminal and Traffic Assessment Act](https://www.ilga.gov/legislation/ilcs/ilcs4.asp?DocName=070501350HArt%2E+15&ActID=3898&ChapterID=50&SeqStart=1100000&SeqEnd=2700000).
   
   There are different fee waiver forms to use if:
 
-  * Your case is a criminal, traffic, or juvenile justice case. If you need to ask for a fee waiver in a criminal case, use the [**Criminal Court fee waiver Easy Form**](https://www.illinoislegalaid.org/node/154466).
+  * Your case is a **civil case** like a divorce or family, eviction, debt collection, small claims, foreclosure, or lawsuit for injury or property damage. This includes cases to expunge or seal criminal records. If you need to ask for a fee waiver in a civil case, use the [**Fee waiver Easy Form**](https://www.illinoislegalaid.org/node/30831).
   * Your case is in the Appellate Court. If you need to ask for a fee waiver in an Appellate case, use the [**Fee waiver - Appellate Court Easy Form**](https://www.illinoislegalaid.org/node/88446). 
   * Your case is in the Illinois Supreme Court. If you need to ask for a fee waiver in a Supreme Court case, use the [**Fee waiver - Supreme Court of Illinois Easy Form**](https://www.illinoislegalaid.org/node/158696).
 ---
@@ -388,9 +392,9 @@ question: |
   % endif
 subquestion: |
   % if filing_basis == "filing_self": 
-  Because you currently receive public benefits, you should qualify for 100% waiver of fees for your civil case.
+  Because you currently receive public benefits, you should qualify for 100% waiver of court assessments for your case.
   % else:
-  Because ${ users[0].familiar() } currently receives public benefits, they should qualify for a 100% waiver of fees in this civil case.
+  Because ${ users[0].familiar() } currently receives public benefits, they should qualify for a 100% waiver of court assessments in this case.
   % endif
 ---
 id: How many dependents do you have
@@ -534,7 +538,7 @@ fields:
 ---
 terms: 
   - "certain types of income": |
-      These income types are listed on the Fee waiver application:
+      These income types are listed on the Assessments waiver application:
       
        * Employment
        * Social Security (not SSI)
@@ -934,7 +938,7 @@ fields:
 ---
 terms: 
   - "certain types of expenses": |
-      These expenses are listed on the Fee waiver application:
+      These expenses are listed on the Assessments waiver application:
       
        * Rent
        * Home mortgage
@@ -1122,7 +1126,7 @@ fields:
 ---
 terms: 
   - "certain types of assets": |
-      These assets are listed on the Fee waiver application:
+      These assets are listed on the Assessments waiver application:
       
        * Money in bank accounts or cash
        * A home
@@ -1243,14 +1247,11 @@ content: |
   [**735 ILCS 5/12-901**](https://www.ilga.gov/legislation/ilcs/fulltext.asp?DocName=073500050K12-1001)
   and [**735 ILCS 5/12-1001**](https://www.ilga.gov/legislation/ilcs/fulltext.asp?DocName=073500050K12-901).
   
-  
-  The judge may decide that ${ you_or_they } qualify for a partial reduction in court fees even if ${ you_or_they } do not qualify for a full waiver.
-  
-  
+  The judge may decide that ${ you_or_they } qualify for a partial reduction in court assessments even if ${ you_or_they } do not qualify for a full waiver.
 ---
-id: Who is filing this fee waiver
+id: Who is filing this assessments waiver
 question: |
-  Whose court case is this fee waiver for?
+  Whose court case is this assessments waiver for?
 fields:
   - I am filing: filing_basis
     datatype: radio
@@ -1358,31 +1359,31 @@ content: |
 id: substantial hardship
 question: |
   % if filing_basis == "filing_self":
-  Will paying court fees be hard for you or your family?
+  Will paying assessments be hard for you or your family?
   % else:
-  Will paying court fees be hard for ${ users[0].familiar() } or their family?
+  Will paying assessments be hard for ${ users[0].familiar() } or their family?
   % endif
 subquestion: |
   % if filing_basis == "filing_self":
   If you want to explain to a judge why you would be harmed if you do not
-  get a fee waiver, you can explain it here. This is optional.
+  get an assessments waiver, you can explain it here. This is optional.
   
   Complete this sentence:
   
-  **It would be a substantial hardship for me or my family if I have to pay the fees, costs, and charges because:**
+  **It would be a substantial hardship for me or my family if I have to pay the assessments because:**
   % else:
   If you want to explain to the judge why ${ users[0].familiar() } would be 
-  harmed if they do not get a fee waiver, you can explain it here. This is optional.
+  harmed if they do not get an assessments waiver, you can explain it here. This is optional.
   
   Complete this sentence:
   
-  **It would be a substantial hardship for ${ users[0].familiar() } or their family if they have to pay the fees, costs, and charges because:**
+  **It would be a substantial hardship for ${ users[0].familiar() } or their family if they have to pay the assessments because:**
   % endif
 fields:
   - no label: substantial_hardship_explanation
     datatype: area
-    rows: 5
-    maxlength: 500
+    rows: 11
+    maxlength: 800
     required: False
 ---
 id: any other users
@@ -1572,9 +1573,9 @@ id: docket number
 question: |
   Do you know ${ your_or_obo_possessive } case number?
 subquestion: |
-  The case number will be listed on ${ your_or_obo_possessive } court papers. The Circuit Clerk gives each case a number when it is filed.
+  The case number will be listed on ${ your_or_obo_possessive } court papers.
   
-  If nothing has been filed yet, select **I don't know the case number**.
+  If you do not know this now, you can add it to your forms later.
 
   ${ collapse_template(case_number_help) }  
 fields:
@@ -1592,9 +1593,7 @@ template: case_number_help
 subject: |
   **Where can I find the case number?**
 content: |  
-  The case number should be on your court papers. Look at the Complaint or Petition, or the Summons if you received one. It is usually in the top-right part of the first page.
-  
-  If you started the case, the court clerk should have given you the case number.
+  The case number should be on your court papers. Look at the Complaint or an Order from the case. It is usually in the top-right part of the first page.
   
   In this example, the case number is **2022 EXAMPLE 123**.
   
@@ -1612,15 +1611,27 @@ subquestion: |
 
   If you do not add your **{e-signature}**, you must sign your paper form before you file it.
 
+  % if trial_court_index == "-1":
   <div class="alert alert-info ilao-info" role="alert">
     <h6 class="alert-heading">What it means to sign your forms</h6>
-    <p>By signing your <i>Application for Waiver of Court Fees</i>, you are certifying that:</p>
+    <p>By signing your <i>Application for Waiver of Criminal and/or Traffic Court Assessments</i>, you are certifying that:</p>
     <p><ul>
       <li>Everything on the forms is true and correct, and</li>
       <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
     </ul></p>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
+  % else:
+  <div class="alert alert-info ilao-info" role="alert">
+    <h6 class="alert-heading">What it means to sign your forms</h6>
+    <p>By signing your <i>Application for Waiver of Criminal Court Assessments</i>, you are certifying that:</p>
+    <p><ul>
+      <li>Everything on the forms is true and correct, and</li>
+      <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
+    </ul></p>
+  <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
+  </div>
+  % endif
 fields:
   - "Add e-signature?": e_signature
     datatype: yesnoradio
@@ -1680,11 +1691,11 @@ under: |
 ---
 id: court choice
 question: |
-  If the judge has questions about the Fee waiver application, how do you want to attend court?
+  If the judge has questions about the Assessments waiver application, how do you want to attend court?
 subquestion: |
   You might already have a court date scheduled in your case.
   
-  Some courts may schedule a separate court date to ask for more information about your Fee waiver application. You might not get your choice, but you can say if you want to attend court for the fee waiver remotely or in person. 
+  Some courts may schedule a separate court date to ask for more information about your Assessments waiver application. You might not get your choice, but you can say if you want to attend court for the assessments waiver remotely or in person. 
 
   The Circuit Clerk should give you details about how to attend court. 
 fields:
@@ -1699,17 +1710,17 @@ continue button field: bring_docs
 question: |
   Supporting documents
 subquestion: |
-  After you file your Fee waiver application, a judge will review it. If they have questions, you may need to give more information or documentation. For example, you may be asked to show:
+  After you file your Assessments waiver application, a judge will review it. If they have questions, you may need to give more information or documentation. For example, you may be asked to show:
   
   * Proof of public benefits received,
   * Proof of income, and
   * The value of any belongings.
   
-  **Note:** Some courts require that you submit proof of benefits or income when you file your Fee waiver application. If you are e-filing, you may need to upload proof of benefits or income.
+  **Note:** Some courts require that you submit proof of benefits or income when you file your Assessments waiver application. If you are e-filing, you may need to upload proof of benefits or income.
   
   Ask your Circuit Clerk what they require. You can look up how to contact them on the [**Illinois Courts website**](https://www.illinoiscourts.gov/courts-directory/interactive-map/by-court-type).
   
-  If you have a court date for your Fee waiver application, be sure to bring whatever documentation is requested.
+  If you have a court date for your Assessments waiver application, be sure to bring whatever documentation is requested.
 ---
 id: forms assembling
 continue button field: forms_assembling
@@ -1729,7 +1740,7 @@ question: |
 subquestion: |
   Your forms are ready. View and download your forms below. Click **Make changes** to fix any mistakes.
 
-  This program does not file your Fee waiver with the court. You will need to do this yourself. Learn about [**e-filing in Illinois**](https://www.illinoiscourts.gov/eservices/information-for-filers-without-lawyers).
+  This program does not file your Assessments waiver with the court. You will need to do this yourself. Learn about [**e-filing in Illinois**](https://www.illinoiscourts.gov/eservices/information-for-filers-without-lawyers).
 
   ${ action_button_html(url_action('review_answers'), label=':edit: Make changes', color='success', size="md") }
   
@@ -1739,7 +1750,7 @@ subquestion: |
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
 
-  **Note:** This program does not file your Fee waiver with the court. Learn about [**e-filing in Illinois**](https://www.illinoiscourts.gov/eservices/information-for-filers-without-lawyers).
+  **Note:** This program does not file your Assessments waiver with the court. Learn about [**e-filing in Illinois**](https://www.illinoiscourts.gov/eservices/information-for-filers-without-lawyers).
   
   Thank you for using ILAO Easy Forms!
 #buttons:
@@ -1756,7 +1767,7 @@ under: |
 generic object: ALDocumentBundle
 template: x.send_email_template
 subject: |
-  Fee waiver forms
+  Assessments waiver forms
 content: |
   Your forms are attached.
   
@@ -1766,10 +1777,10 @@ content: |
 ---
 objects:
   - IL_fee_waiver_Post_interview_instructions: ALDocument.using(title="Instructions", filename="instructions.pdf", has_addendum=False)
-  - IL_fee_waiver_attachment: ALDocument.using(title="Fee waiver application", filename="Fee waiver application.pdf", has_addendum=False)
+  - IL_fee_waiver_attachment: ALDocument.using(title="Assessments waiver application", filename="Fee waiver application.pdf", has_addendum=False)
   - IL_fee_waiver_supplement: ALDocument.using(title="Winnebago supplement", filename="Winnebago supplement.pdf", has_addendum=False)
   - kankakee_supplement: ALDocument.using(title="Kankakee supplement", filename="Kankakee supplement.pdf", has_addendum=False)
-  - IL_fee_waiver_order: ALDocument.using(title="Fee waiver order", filename="Fee waiver order.pdf", has_addendum=False)
+  - IL_fee_waiver_order: ALDocument.using(title="Assessments waiver order", filename="Fee waiver order.pdf", has_addendum=False)
 ---
 code: |
   IL_fee_waiver_Post_interview_instructions.enabled = True
