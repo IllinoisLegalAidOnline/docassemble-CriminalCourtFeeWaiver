@@ -95,13 +95,12 @@ code: |
   set_progress(75)
   nav.set_section('section_about_you')
   substantial_hardship_explanation
+  hide_address
+  users[0].address.address
   if filing_basis == "filing_self":
-    hide_address
-    users[0].address.address
     users[0].has_email_address
   if filing_basis != "filing_self":
-    users[0].address.address
-    hide_address
+    hide_signer_address
     signer[0].address.address
     signer[0].has_email_address
 
@@ -1495,10 +1494,28 @@ fields:
 ---
 id: hide address
 question: |
+  % if filing_basis == "filing_self":
+  Do you want to keep your address hidden?
+  % else:
+  Do you want to keep ${ users[0].familiar() }'s address hidden?
+  % endif
+subquestion: |
+  % if filing_basis == "filing_self":
+  You do not need to list where you are staying on your court papers. You can use an address where you can receive court notices instead.
+  % else:
+  You do not need to list where ${ users[0].familiar() } is staying on their court papers. You can use an address where ${ users[0].familiar() } can receive court notices instead.
+  % endif
+field: hide_address
+choices:
+  - Yes: True
+  - No: False
+---
+id: hide signer address
+question: |
   Do you want to keep your address hidden?
 subquestion: |
   You do not need to list where you are staying on your court papers. You can use an address where you can receive court notices instead.
-field: hide_address
+field: hide_signer_address
 choices:
   - Yes: True
   - No: False
@@ -1517,7 +1534,11 @@ question: |
   What is your home address?
   % endif
   % else:
-  What is ${ users[0].familiar() }'s address?
+  % if hide_address:
+  What is ${ users[0].familiar() }'s mailing address?
+  % else:
+  What is ${ users[0].familiar() }'s home address?
+  % endif
   % endif
 subquestion: |
   % if filing_basis == "filing_self":
@@ -1525,6 +1546,12 @@ subquestion: |
   **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
   % else:
   **This address will appear on your court papers.** If you do not want this, click **Back** to keep this address hidden.
+  % endif
+  % else:
+  % if hide_address:
+  **This address will appear on ${ users[0].familiar() }'s court papers.**
+  % else:
+  **This address will appear on ${ users[0].familiar() }'s court papers.** If you do not want this, click **Back** to keep this address hidden.
   % endif
   % endif
 fields:
@@ -1546,13 +1573,13 @@ sets:
   - signer[0].address.city
   - signer[0].address.zip
 question: |
-  % if hide_address:
+  % if hide_signer_address:
   What is your mailing address?
   % else:
   What is your home address?
   % endif
 subquestion: |
-  % if hide_address:
+  % if hide_signer_address:
   **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
   % else:
   **This address will appear on your court papers.** If you do not want this, click **Back** to keep your address hidden.
@@ -1903,14 +1930,25 @@ attachments:
       - "filing_obo_cb": ${ True if filing_basis != "filing_self" else ""}
       - "user_name_full": ${ users[0].name.full(middle="full") }
       - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
-      - "hide_address": ${ hide_address }
+      - "hide_address": |
+          % if filing_basis != "filing_self":
+          ${ hide_signer_address }
+          % else:
+          ${ hide_address }
+          % endif
       - "signer_name_full": |
           % if filing_basis != "filing_self":
           ${ signer[0].name.full(middle="full") }
           % else:
           ${ users[0].name.full(middle="full") }
           % endif
-      - "user_address_one_line__2": ${ users[0].address.on_one_line(bare=True) }
+      - "user_address_one_line__2": |
+          % if filing_basis != "filing_self":
+          ${ signer[0].address.on_one_line(bare=True) }
+          % else:
+          ${ users[0].address.on_one_line(bare=True) }
+          % endif
+
       - "signer_signature_no_slash": |
           % if filing_basis != "filing_self":          
           ${ signer[0].name.full(middle="full") if e_signature else '' }
@@ -1923,23 +1961,23 @@ attachments:
           % elif users[0].has_email_address:
           ${ users[0].email }
           % endif
-      - "signer_address_city_state_zip": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].address.line_two() }
-          % else:
-          ${ users[0].address.line_two() }
-          % endif
+#      - "signer_address_line_one": |
+#          % if filing_basis != "filing_self":
+#          ${ signer[0].address.line_one(bare=True) }
+#          % else:
+#          ${ users[0].address.line_one(bare=True) }
+#          % endif
+#      - "signer_address_city_state_zip": |
+#          % if filing_basis != "filing_self":
+#          ${ signer[0].address.line_two() }
+#          % else:
+#          ${ users[0].address.line_two() }
+#          % endif
       - "signer_phone_number": |
           % if filing_basis != "filing_self":
           ${ phone_number_formatted(signer[0].phone_numbers()) }
           % else:
           ${ phone_number_formatted(users[0].phone_numbers()) }
-          % endif
-      - "signer_address_line_one": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].address.line_one(bare=True) }
-          % else:
-          ${ users[0].address.line_one(bare=True) }
           % endif
       - "signer_attorney_number": |
           % if filing_basis != "filing_self" and signer_attorney_number:          
@@ -2238,14 +2276,25 @@ attachments:
       - "filing_obo_cb": ${ True if filing_basis != "filing_self" else ""}
       - "user_name_full": ${ users[0].name.full(middle="full") }
       - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
-      - "hide_address": ${ hide_address }
+      - "hide_address": |
+          % if filing_basis != "filing_self":
+          ${ hide_signer_address }
+          % else:
+          ${ hide_address }
+          % endif
       - "signer_name_full": |
           % if filing_basis != "filing_self":
           ${ signer[0].name.full(middle="full") }
           % else:
           ${ users[0].name.full(middle="full") }
           % endif
-      - "user_address_one_line__2": ${ users[0].address.on_one_line(bare=True) }
+      - "user_address_one_line__2": |
+          % if filing_basis != "filing_self":
+          ${ signer[0].address.on_one_line(bare=True) }
+          % else:
+          ${ users[0].address.on_one_line(bare=True) }
+          % endif
+      
       - "signer_signature_no_slash": |
           % if filing_basis != "filing_self":          
           ${ signer[0].name.full(middle="full") if e_signature else '' }
@@ -2258,23 +2307,23 @@ attachments:
           % elif users[0].has_email_address:
           ${ users[0].email }
           % endif
-      - "signer_address_city_state_zip": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].address.line_two() }
-          % else:
-          ${ users[0].address.line_two() }
-          % endif
+#      - "signer_address_line_one": |
+#          % if filing_basis != "filing_self":
+#          ${ signer[0].address.line_one(bare=True) }
+#          % else:
+#          ${ users[0].address.line_one(bare=True) }
+#          % endif
+#      - "signer_address_city_state_zip": |
+#          % if filing_basis != "filing_self":
+#          ${ signer[0].address.line_two() }
+#          % else:
+#          ${ users[0].address.line_two() }
+#          % endif
       - "signer_phone_number": |
           % if filing_basis != "filing_self":
           ${ phone_number_formatted(signer[0].phone_numbers()) }
           % else:
           ${ phone_number_formatted(users[0].phone_numbers()) }
-          % endif
-      - "signer_address_line_one": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].address.line_one(bare=True) }
-          % else:
-          ${ users[0].address.line_one(bare=True) }
           % endif
       - "signer_attorney_number": |
           % if filing_basis != "filing_self" and signer_attorney_number:          
@@ -2935,6 +2984,14 @@ review:
       % else:
       ${ docket_number }
       % endif
+  - Edit: hide_address
+    button: |
+      % if filing_basis != "filing_self":
+      **Do you want to keep ${ users[0].familiar() }'s address hidden?**
+      % else:
+      **Do you want to keep your address hidden?**
+      % endif
+      ${ word(yesno(hide_address)) }
   - Edit: users[0].address.address
     button: |
       % if filing_basis != "filing_self":
@@ -2947,6 +3004,11 @@ review:
     button: |
       **Your name:**
       ${ signer[0].name.full(middle="full") }
+    show if: filing_basis != "filing_self"
+  - Edit: hide_signer_address
+    button: |
+      **Do you want to keep your address hidden?**
+      ${ word(yesno(hide_signer_address)) }
     show if: filing_basis != "filing_self"
   - Edit: signer[0].address.address
     button: |
@@ -2994,11 +3056,11 @@ review:
       
   - Edit: e_signature
     button: |
-      **Do you want to add your e-signature to your fee waiver?**
+      **Do you want to add your e-signature to your Assessments waiver?**
       ${ word(yesno(e_signature)) }
   - Edit: court_choice
     button: |
-      **If the judge has questions about your Fee waiver application, you want to attend court:**
+      **If the judge has questions about your Assessments waiver application, you want to attend court:**
       
       % if court_choice == 'remote':
       * Remotely (by video or telephone)
@@ -3626,6 +3688,15 @@ review:
     button: |
       **Number of minor dependents**:
       ${ user_dependents_children }
+
+  - Edit: hide_address
+    button: |
+      % if filing_basis != "filing_self":
+      **Do you want to keep ${ users[0].familiar() }'s address hidden?**
+      % else:
+      **Do you want to keep your address hidden?**
+      % endif
+      ${ word(yesno(hide_address)) }
   - Edit: users[0].address.address
     button: |
       % if filing_basis != "filing_self":
@@ -3638,6 +3709,11 @@ review:
     button: |
       **Your name:**
       ${ signer[0].name.full(middle="full") }
+    show if: filing_basis != "filing_self"
+  - Edit: hide_signer_address
+    button: |
+      **Do you want to keep your address hidden?**
+      ${ word(yesno(hide_signer_address)) }
     show if: filing_basis != "filing_self"
   - Edit: signer[0].address.address
     button: |
@@ -3684,11 +3760,11 @@ review:
     show if: users[0].has_email_address == True
   - Edit: e_signature
     button: |
-      **Do you want to add your e-signature to your fee waiver?**
+      **Do you want to add your e-signature to your Assessments waiver?**
       ${ word(yesno(e_signature)) }
   - Edit: court_choice
     button: |
-      **If the judge has questions about your Fee waiver application, you want to attend court:**
+      **If the judge has questions about your Assessments waiver application, you want to attend court:**
       
       % if court_choice == 'remote':
       * Remotely (by video or telephone)
