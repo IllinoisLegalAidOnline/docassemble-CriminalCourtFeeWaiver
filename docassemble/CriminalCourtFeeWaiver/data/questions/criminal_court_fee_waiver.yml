@@ -1287,6 +1287,9 @@ fields:
       is: filing_on_behalf_of        
   - Attorney number (if any): signer_attorney_number      
     required: False
+    help: |
+      Some jurisdictions like Cook County require a firm or an individual attorney number. If you are an attorney licensed in Illinois, you can enter your number if filing on behalf of another person.
+    maxlength: 20
     show if: 
       variable: filing_basis
       is: filing_on_behalf_of
@@ -1387,6 +1390,8 @@ fields:
     rows: 11
     maxlength: 800
     required: False
+  - note: |
+      The form has room for about 800 characters including spaces.
 ---
 id: any other users
 question: |
