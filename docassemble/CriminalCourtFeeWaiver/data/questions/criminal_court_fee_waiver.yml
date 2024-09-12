@@ -1288,7 +1288,7 @@ fields:
   - Attorney number (if any): signer_attorney_number      
     required: False
     help: |
-      Some jurisdictions like Cook County require a firm or an individual attorney number. If you are an attorney licensed in Illinois, you can enter your number if filing on behalf of another person.
+      If you are an attorney licensed in Illinois, you can enter your number if filing on behalf of another person. Some jurisdictions like Cook or DuPage County require a firm or an individual attorney number.
     maxlength: 20
     show if: 
       variable: filing_basis
@@ -1387,7 +1387,7 @@ subquestion: |
 fields:
   - no label: substantial_hardship_explanation
     datatype: area
-    rows: 11
+    rows: 13
     maxlength: 800
     required: False
   - note: |
