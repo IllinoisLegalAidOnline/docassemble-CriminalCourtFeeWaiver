@@ -252,9 +252,9 @@ continue button field: criminal_court_fee_waiver
 question: |
   Criminal or traffic assessments waiver for Circuit Court cases
 subquestion: |
-  You can use this program to make assessments waiver forms if you have a **criminal case** in Circuit Court anywhere in Illinois.
+  You can use this program to make waiver forms if you have to pay assessments in a **criminal case** in Circuit Court anywhere in Illinois.
   
-  You can also use this program if you have assessments in Cook County for **traffic and petty offenses** in Schedules 2, 6, 9, 10, and 13 of [**Article 15 of the Criminal and Traffic Assessment Act**](https://www.ilga.gov/legislation/ilcs/ilcs4.asp?DocName=070501350HArt%2E+15&ActID=3898&ChapterID=50&SeqStart=1100000&SeqEnd=2700000).
+  You can also use this program to make waiver forms if you have to pay assessments in Cook County for **traffic and petty offenses** in Schedules 2, 6, 9, 10, and 13 of [**Article 15 of the Criminal and Traffic Assessment Act**](https://www.ilga.gov/legislation/ilcs/ilcs4.asp?DocName=070501350HArt%2E+15&ActID=3898&ChapterID=50&SeqStart=1100000&SeqEnd=2700000).
   
   There are different fee waiver forms to use if:
 
@@ -407,6 +407,12 @@ question: |
   Does anyone live with ${ users[0].familiar() } that they support
   financially?
   % endif
+subquestion: |
+  % if filing_basis == "filing_self":
+  Click **Yes** if your household members rely on you for money or to pay their bills.  
+  % else:
+  Click **Yes** if ${ users[0].familiar() }'s household members rely on ${ users[0].familiar() } for money or to pay their bills.
+  % endif  
 fields:
   - Support household members: user_has_dependents
     datatype: yesnoradio
@@ -427,7 +433,7 @@ question: |
   What income did ${ users[0].familiar() } receive in the last month?
   % endif
 subquestion: |
-  List the amount of income you received before taxes.
+  List the amount of income received before taxes.
 fields:
   - label: |
       % if filing_basis == "filing_self":
@@ -496,7 +502,7 @@ question: |
   What other income did ${ users[0].familiar() } receive in the last month?
   % endif
 subquestion: |
-  List the amount of income you received before taxes.
+  List the amount of income received before taxes.
 fields:
   - "Type or source of income": user_income_other_list[i].name.text
     maxlength: 25
@@ -594,12 +600,12 @@ question: |
   What income did ${ users[0].familiar() } get in the last 12 months?
   % endif
 subquestion: |
-  We will use the information that you gave us about income from
-  last month as a starting point. Look it over carefully and make
-  any corrections that you need.
-  
   Enter the actual amount received **over the last 12 months** for each kind
-  of income. List the amount of income you received before taxes.
+  of income. List the amount of income received before taxes.
+  
+  **Note:** We used the information you gave us about income from
+  last month and multiplied it by 12 as a starting point. Look it over carefully
+  and make any corrections you need.
 
 fields:
   - label: |
@@ -1228,10 +1234,9 @@ subquestion: |
   
   #### A judge makes the final decision
   This website cannot tell you if ${ you_or_they } qualify for sure. The judge will
-  consider all of the information you provided.
+  consider all of the information you provided. Click **Next** to continue making your forms.
   
   ${ collapse_template(other_fee_waiver_considerations) }  
-
 ---
 template: other_fee_waiver_considerations
 subject: |
