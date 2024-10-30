@@ -84,12 +84,8 @@ code: |
     
   set_progress(50)
   nav.set_section('section_case_info')
-  #user_ask_role
   users[0].name.first
-  #users.there_is_another = False   #### trying without this line
-  #other_parties.gather()  
   docket_number
-  #plaintiffs - test to see if this will work
   defendants
 
   set_progress(75)
@@ -179,9 +175,9 @@ question: |
 subquestion: |
   Welcome to Illinois Legal Aid Online's **Criminal Court fee waiver** Easy Form.
   
-  This program creates a form that asks the court to waive or reduce criminal court assessments. You can also use it to ask the court to waive or reduce traffic court assessments in Cook County, Illinois.
+  This program creates a form that asks the court to waive or reduce criminal court assessments.
   
-  Criminal or traffic court assessments are **costs charged to a defendant in a criminal case once the defendant pleads guilty or is found guilty**. They do not include fines or restitution ordered by the judge to be paid by the defendant. This means that this waiver may not apply to some court costs and fees associated with your case.
+  Criminal court assessments are **costs charged to a defendant in a criminal case once the defendant pleads guilty or is found guilty**. They do not include fines or restitution ordered by the judge to be paid by the defendant. This means that this waiver may not apply to some court costs and fees associated with your case.
   
 field: sees_nav_bar
 ---
@@ -235,7 +231,7 @@ question: |
 subquestion: |
   After you download your forms, you must file them with the court. This program does not file your forms for you.
   
-  **Note:** in criminal and traffic cases you must file an Application for Waiver of Criminal Court Assessments **no later than 30 days after the sentencing date**. You are responsible for knowing if there are other deadlines to file the documents.
+  **Note:** in criminal cases you must file an Application for Waiver of Criminal Court Assessments **no later than 30 days after the sentencing date**. You are responsible for knowing if there are other deadlines to file the documents.
   
   To learn more, read the instructions you can download at the end of this program. 
 ---
@@ -247,18 +243,16 @@ content: |
   
   Use [**Get Legal Help**](https://www.illinoislegalaid.org/get-legal-help) to find free or low-cost legal services in your area.
 ---
-id: criminal and traffic court only
+id: criminal court only
 continue button field: criminal_court_fee_waiver
 question: |
-  Criminal or traffic assessments waiver for Circuit Court cases
+  Criminal assessments waiver for Circuit Court cases
 subquestion: |
   You can use this program to make waiver forms if you have to pay assessments in a **criminal case** in Circuit Court anywhere in Illinois.
   
-  You can also use this program to make waiver forms if you have to pay assessments in Cook County for **traffic and petty offenses** in Schedules 2, 6, 9, 10, and 13 of [**Article 15 of the Criminal and Traffic Assessment Act**](https://www.ilga.gov/legislation/ilcs/ilcs4.asp?DocName=070501350HArt%2E+15&ActID=3898&ChapterID=50&SeqStart=1100000&SeqEnd=2700000).
-  
   There are different fee waiver forms to use if:
 
-  * Your case is a **civil case** like a divorce or family, eviction, debt collection, small claims, foreclosure, or lawsuit for injury or property damage. This includes cases to expunge or seal criminal records. If you need to ask for a fee waiver in a civil case, use the [**Fee waiver Easy Form**](https://www.illinoislegalaid.org/node/30831).
+  * Your case is a **civil case** like a divorce or other family law case, or an eviction, debt collection, small claims, foreclosure, or lawsuit for injury or property damage. This includes cases to expunge or seal criminal records. If you need to ask for a fee waiver in a civil case, use the [**Fee waiver Easy Form**](https://www.illinoislegalaid.org/node/30831).
   * Your case is in the Appellate Court. If you need to ask for a fee waiver in an Appellate case, use the [**Fee waiver - Appellate Court Easy Form**](https://www.illinoislegalaid.org/node/88446). 
   * Your case is in the Illinois Supreme Court. If you need to ask for a fee waiver in a Supreme Court case, use the [**Fee waiver - Supreme Court of Illinois Easy Form**](https://www.illinoislegalaid.org/node/158696).
 ---
@@ -783,9 +777,9 @@ code: |
 id: What expenses do you have right now
 question: |
   % if filing_basis == "filing_self":
-  What expenses do you have right now?
+  What monthly expenses do you have right now?
   % else:
-  What expenses does ${ users[0].familiar() } have right now?
+  What monthly expenses does ${ users[0].familiar() } have right now?
   % endif
 subquestion: |
   Enter the amount that each expense costs **per month**.
@@ -1298,11 +1292,6 @@ fields:
     show if: 
       variable: filing_basis
       is: filing_on_behalf_of
-  #- How are you related to the person you are filing for?: relationship_to_minor
-  #  maxlength: 33
-  #  show if: 
-  #    variable: filing_basis
-  #    is: filing_on_behalf_of
 ---
 id: birth year
 question: |
@@ -1622,7 +1611,6 @@ fields:
     maxlength: 20
     hide if: dont_know_docket_number
 validation code: |
-  # This should be safe to 
   if dont_know_docket_number:
     docket_number = ''      
 ---
@@ -1648,17 +1636,6 @@ subquestion: |
 
   If you do not add your **{e-signature}**, you must sign your paper form before you file it.
 
-  % if trial_court_index == "-1":
-  <div class="alert alert-info ilao-info" role="alert">
-    <h6 class="alert-heading">What it means to sign your forms</h6>
-    <p>By signing your <i>Application for Waiver of Criminal and/or Traffic Court Assessments</i>, you are certifying that:</p>
-    <p><ul>
-      <li>Everything on the forms is true and correct, and</li>
-      <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
-    </ul></p>
-  <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
-  </div>
-  % else:
   <div class="alert alert-info ilao-info" role="alert">
     <h6 class="alert-heading">What it means to sign your forms</h6>
     <p>By signing your <i>Application for Waiver of Criminal Court Assessments</i>, you are certifying that:</p>
@@ -1668,7 +1645,6 @@ subquestion: |
     </ul></p>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
-  % endif
 fields:
   - "Add e-signature?": e_signature
     datatype: yesnoradio
@@ -1765,7 +1741,11 @@ question: |
   Almost done
 subquestion: |
   After you click **Next**, it may take a few moments to finish making your forms.
+
+  % if trial_court_index == "-1":
+  **Note:** Cook County judges look at Public Benefits and other sections of the Application. It is normal for all sections to be filled in.
   
+  % endif
   ###### You do not need to refresh your screen. Hang in there!
   
   [NEWLINE]
@@ -1790,8 +1770,6 @@ subquestion: |
   **Note:** This program does not file your Assessments waiver with the court. Learn about [**e-filing in Illinois**](https://www.illinoiscourts.gov/eservices/information-for-filers-without-lawyers).
   
   Thank you for using ILAO Easy Forms!
-#buttons:
-  #- ${fa_icon("envelope", color="#0079d0", size="sm")} Email your forms: continue
 under: |
   % if not user_logged_in():
   [${fa_icon("sign-in-alt", color="#0079d0", size="sm")} Sign-in](${url_of('login', next=interview_url())}) or [**create**](${url_of('register', next=interview_url())}) an ILAO Easy Form account to save your progress (optional).
@@ -1817,35 +1795,21 @@ objects:
   - IL_fee_waiver_attachment: ALDocument.using(title="Assessments waiver application", filename="Assessments waiver application.pdf", has_addendum=False)
   - IL_fee_waiver_supplement: ALDocument.using(title="Winnebago supplement", filename="Winnebago supplement.pdf", has_addendum=False)
   - IL_fee_waiver_order: ALDocument.using(title="Assessments waiver order", filename="Assessments waiver order.pdf", has_addendum=False)
-  - cook_waiver_Post_interview_instructions: ALDocument.using(title="Instructions", filename="instructions.pdf", has_addendum=False)
-  - cook_waiver_attachment: ALDocument.using(title="Assessments waiver application", filename="Assessments waiver application.pdf", has_addendum=False)
-  - cook_waiver_order: ALDocument.using(title="Assessments waiver order", filename="Assessments waiver order.pdf", has_addendum=False)
 ---
 code: |
-  IL_fee_waiver_Post_interview_instructions.enabled = False
-  IL_fee_waiver_attachment.enabled = False
+  IL_fee_waiver_Post_interview_instructions.enabled = True
+  IL_fee_waiver_attachment.enabled = True
+  IL_fee_waiver_order.enabled = True
   IL_fee_waiver_supplement.enabled = False
-  IL_fee_waiver_order.enabled = False
-  cook_waiver_Post_interview_instructions.enabled = False
-  cook_waiver_attachment.enabled = False
-  cook_waiver_order.enabled = False
-
-  if trial_court_index == "-1":
-    cook_waiver_Post_interview_instructions.enabled = True
-    cook_waiver_attachment.enabled = True
-    cook_waiver_order.enabled = True
-  else:
-    IL_fee_waiver_Post_interview_instructions.enabled = True
-    IL_fee_waiver_attachment.enabled = True
-    IL_fee_waiver_order.enabled = True
 
   if trial_court.address.county == "Winnebago":
     IL_fee_waiver_supplement.enabled = True
 
+
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[IL_fee_waiver_Post_interview_instructions, IL_fee_waiver_attachment, IL_fee_waiver_supplement, IL_fee_waiver_order, cook_waiver_Post_interview_instructions, cook_waiver_attachment, cook_waiver_order], filename="Assessments_waiver_package.pdf", title="All forms")
-  - al_court_bundle: ALDocumentBundle.using(elements=[IL_fee_waiver_attachment, IL_fee_waiver_supplement, IL_fee_waiver_order, cook_waiver_attachment, cook_waiver_order], filename="Assessments_waiver_package.pdf", title="Download all forms")
+  - al_user_bundle: ALDocumentBundle.using(elements=[IL_fee_waiver_Post_interview_instructions, IL_fee_waiver_attachment, IL_fee_waiver_supplement, IL_fee_waiver_order], filename="Assessments_waiver_package.pdf", title="All forms")
+  - al_court_bundle: ALDocumentBundle.using(elements=[IL_fee_waiver_attachment, IL_fee_waiver_supplement, IL_fee_waiver_order], filename="Assessments_waiver_package.pdf", title="Download all forms")
 ---
 attachments:
   - name: Post interview instructions
@@ -1855,15 +1819,6 @@ attachments:
     editable: False
     fields:
         - "fake": ${ "" }
-
-  - name: Cook post interview instructions
-    filename: Cook-waiver-instructions     
-    variable name: cook_waiver_Post_interview_instructions[i]        
-    pdf template file: waiver_instructions_cook.pdf
-    editable: False
-    fields:
-        - "fake": ${ "" }
-
 
   - name: IL fee waiver order   
     filename: IL_fee_waiver_order
@@ -1877,20 +1832,6 @@ attachments:
       - "docket_number": ${ docket_number }
       - "docket_number__2": ${ docket_number }
       - "docket_number__3": ${ docket_number }
-      - "user_name_full": ${ users[0].name.full(middle="full") }
-
-  - name: Cook waiver order   
-    filename: cook_waiver_order
-    variable name: cook_waiver_order[i]
-    skip undefined: True
-    pdf template file: waiver_order_cook.pdf
-    editable: False
-    fields:
-      - "defendant": ${ defendants[0].name.full(middle="full") }      
-      - "docket_number": ${ docket_number }
-      - "docket_number__2": ${ docket_number }
-      - "docket_number__3": ${ docket_number }
-      - "docket_number__4": ${ docket_number }
       - "user_name_full": ${ users[0].name.full(middle="full") }
 
 
@@ -1971,364 +1912,6 @@ attachments:
           % elif users[0].has_email_address:
           ${ users[0].email }
           % endif
-#      - "signer_address_line_one": |
-#          % if filing_basis != "filing_self":
-#          ${ signer[0].address.line_one(bare=True) }
-#          % else:
-#          ${ users[0].address.line_one(bare=True) }
-#          % endif
-#      - "signer_address_city_state_zip": |
-#          % if filing_basis != "filing_self":
-#          ${ signer[0].address.line_two() }
-#          % else:
-#          ${ users[0].address.line_two() }
-#          % endif
-      - "signer_phone_number": |
-          % if filing_basis != "filing_self":
-          ${ phone_number_formatted(signer[0].phone_numbers()) }
-          % else:
-          ${ phone_number_formatted(users[0].phone_numbers()) }
-          % endif
-      - "signer_attorney_number": |
-          % if filing_basis != "filing_self" and signer_attorney_number:          
-          ${ signer_attorney_number }
-          % endif
-      - "user_dependents_adults": |
-          % if user_has_dependents:
-          ${ user_dependents_adults }
-          % else:
-          0
-          % endif
-      - "user_dependents_children": |
-          % if user_has_dependents:
-          ${ user_dependents_children }
-          % else:
-          0
-          % endif
-      - "benefits_ssi": ${ True if user_benefits['SSI'] == True else '' }
-      - "benefits_aabd": ${ True if user_benefits['AABD'] == True else '' }
-      - "benefits_ga": ${ True if user_benefits['GA'] == True else '' }
-      - "benefits_snap": ${ True if user_benefits['SNAP'] == True else '' }
-      - "benefits_tanf": ${ True if user_benefits['TANF'] == True else '' }
-      - "user_receives_benefits_yes": ${ user_benefits.any_true() }
-      - "user_receives_benefits_no": ${ user_benefits.all_false() }
-      - "user_pending_benefits_yes": ${ True if user_applied_for_benefits else '' }
-      - "user_pending_benefits_no": ${ True if user_applied_for_benefits == False else '' }
-      - "user_income_ss": |
-          % if not user_income_none:
-          ${ user_income_ss }
-          % endif
-      - "user_income_employment":  |
-          % if not user_income_none:
-          ${ user_income_employment }
-          % endif
-      - "user_income_employment_amount":  |
-          % if not user_income_none:
-          ${ thousands(user_income_employment_amount, show_decimals=True) }
-          % endif
-      - "user_income_ss_amount":  |
-          % if not user_income_none:
-          ${ thousands(user_income_ss_amount, show_decimals=True) }
-          % endif
-      - "user_income_child_support":  |
-          % if not user_income_none:
-          ${ user_income_child_support }
-          % endif
-      - "user_income_unemployment":  |
-          % if not user_income_none:
-          ${ user_income_unemployment }
-          % endif
-      - "user_income_child_support_amount":  |
-          % if not user_income_none:
-          ${ thousands(user_income_child_support_amount, show_decimals=True) }
-          % endif
-      - "user_income_unemployment_amount":  |
-          % if not user_income_none:
-          ${ thousands(user_income_unemployment_amount, show_decimals=True) }
-          % endif
-      - "user_income_pension":  |
-          % if not user_income_none:
-          ${ user_income_pension }
-          % endif
-      - "user_income_pension_amount":  |
-          % if not user_income_none:
-          ${ thousands(user_income_pension_amount, show_decimals=True) }
-          % endif
-      - "user_income_household":  |
-          % if not user_income_none:
-          ${ user_income_household }
-          % endif
-      - "user_income_household_amount":  |
-          % if not user_income_none:
-          ${ thousands(user_income_household_amount, show_decimals=True) }
-          % endif
-      - "user_income_other":  |
-          % if not user_income_none:
-          ${ user_income_other }
-          % endif
-      - "user_income_other_amount_1":  |
-          % if not user_income_none:
-          ${ thousands(user_income_other_list[0].amount, show_decimals=True) }
-          % endif
-      - "user_income_other_kind_1":  |
-          % if not user_income_none:
-          ${ user_income_other_list[0].name.text }
-          % endif
-      - "user_income_other_amount_2":  |
-          % if not user_income_none:
-          ${ thousands(user_income_other_list[1].amount, show_decimals=True) }
-          % endif
-      - "user_income_other_kind_2":  |
-          % if not user_income_none:
-          ${ user_income_other_list[1].name.text }
-          % endif
-      - "user_income_other_amount_3":  |
-          % if not user_income_none:
-          ${ thousands(user_income_other_list[2].amount, show_decimals=True) }
-          % endif
-      - "user_income_other_kind_3":  |
-          % if not user_income_none:
-          ${ user_income_other_list[2].name.text }
-          % endif
-      - "user_income_none": ${ user_income_none }
-      - "user_income_total":  |
-          % if not user_income_none:
-          ${ thousands(user_income_total, show_decimals=True) }
-          % endif
-      - "user_annual_ss_amount": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_ss_amount, show_decimals=True) }
-          % endif
-      - "user_annual_employment": |           
-          % if not user_annual_none:
-          ${ user_annual_employment }
-          % endif
-      - "user_annual_employment_amount": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_employment_amount, show_decimals=True) }
-          % endif 
-      - "user_annual_ss": |
-          % if not user_annual_none:
-          ${ user_annual_ss }
-          % endif
-      - "user_annual_unemployment": |
-          % if not user_annual_none:
-          ${ user_annual_unemployment }
-          % endif
-      - "user_annual_child_support": |
-          % if not user_annual_none:
-          ${ user_annual_child_support }
-          % endif
-      - "user_annual_child_support_amount": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_child_support_amount, show_decimals=True) }
-          % endif
-      - "user_annual_unemployment_amount": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_unemployment_amount, show_decimals=True) }
-          % endif
-      - "user_annual_pension": |
-          % if not user_annual_none:
-          ${ user_annual_pension }
-          % endif
-      - "user_annual_pension_amount": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_pension_amount, show_decimals=True) }
-          % endif
-      - "user_annual_household": |
-          % if not user_annual_none:
-          ${ user_annual_household }
-          % endif
-      - "user_annual_household_amount": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_household_amount, show_decimals=True) }
-          % endif
-      - "user_annual_other": |
-          % if not user_annual_none:
-          ${ user_annual_other }
-          % endif
-      - "user_annual_other_amount_1":  |
-          % if not user_annual_none:
-          ${ thousands(user_annual_other_list[0].amount, show_decimals=True) }
-          % endif
-      - "user_annual_other_kind_1":  |
-          % if not user_annual_none:
-          ${ user_annual_other_list[0].name.text }
-          % endif
-      - "user_annual_other_amount_2":  |
-          % if not user_annual_none:
-          ${ thousands(user_annual_other_list[1].amount, show_decimals=True) }
-          % endif
-      - "user_annual_other_kind_2":  |
-          % if not user_annual_none:
-          ${ user_annual_other_list[1].name.text }
-          % endif
-      - "user_annual_other_amount_3":  |
-          % if not user_annual_none:
-          ${ thousands(user_annual_other_list[2].amount, show_decimals=True) }
-          % endif
-      - "user_annual_other_kind_3":  |
-          % if not user_annual_none:
-          ${ user_annual_other_list[2].name.text }
-          % endif
-      - "user_annual_none": ${ user_annual_none }
-      - "user_annual_total": |
-          % if not user_annual_none:
-          ${ thousands(user_annual_total, show_decimals=True) }
-          % endif
-      - "user_expense_rent": ${ user_expense_rent }
-      - "user_expense_rent_amount": ${ thousands(user_expense_rent_amount, show_decimals=True) }
-      - "user_expense_mortgage": ${ user_expense_mortgage }
-      - "user_expense_mortgage_amount": ${ thousands(user_expense_mortgage_amount, show_decimals=True) }
-      - "user_expense_other_mortgage": ${ user_expense_other_mortgage }
-      - "user_expense_other_mortgage_amount": ${ thousands(user_expense_other_mortgage_amount, show_decimals=True) }
-      - "user_expense_utilities": ${ user_expense_utilities }
-      - "user_expense_utilities_amount": ${ thousands(user_expense_utilities_amount, show_decimals=True) }
-      - "user_expense_food": ${ user_expense_food }
-      - "user_expense_food_amount": ${ thousands(user_expense_food_amount, show_decimals=True) }
-      - "user_expense_medical": ${ user_expense_medical }
-      - "user_expense_medical_amount": ${ thousands(user_expense_medical_amount, show_decimals=True) }
-      - "user_expense_car": ${ user_expense_car }
-      - "user_expense_car_amount": ${ thousands(user_expense_car_amount, show_decimals=True) }
-      - "user_expense_childcare": ${ user_expense_childcare }
-      - "user_expense_childcare_amount": ${ thousands(user_expense_childcare_amount, show_decimals=True) }
-      - "user_expense_child_support": ${ user_expense_child_support }
-      - "user_expense_child_support_amount": ${ thousands(user_expense_child_support_amount, show_decimals=True) }
-      - "user_expense_other": ${ user_expense_other }
-      - "user_expense_other_amount_1":  |
-          % if not user_expense_none:
-          ${ thousands(user_expense_other_list[0].amount, show_decimals=True) }
-          % endif
-      - "user_expense_other_kind_1":  |
-          % if not user_expense_none:
-          ${ user_expense_other_list[0].name.text }
-          % endif
-      - "user_expense_other_amount_2":  |
-          % if not user_expense_none:
-          ${ thousands(user_expense_other_list[1].amount, show_decimals=True) }
-          % endif
-      - "user_expense_other_kind_2":  |
-          % if not user_expense_none:
-          ${ user_expense_other_list[1].name.text }
-          % endif
-      - "user_expense_other_amount_3":  |
-          % if not user_expense_none:
-          ${ thousands(user_expense_other_list[2].amount, show_decimals=True) }
-          % endif
-      - "user_expense_other_kind_3":  |
-          % if not user_expense_none:
-          ${ user_expense_other_list[2].name.text }
-          % endif
-      - "user_expense_none": ${ user_expense_none }
-      - "user_expense_total": ${ thousands(user_expense_total, show_decimals=True) }
-      - "user_asset_bank_account": ${ user_asset_bank_account }
-      - "user_asset_bank_account_amount": ${ thousands(user_asset_bank_account_amount, show_decimals=True) }
-      - "user_asset_home": ${ user_asset_home }
-      - "user_asset_home_amount": ${ thousands(user_asset_home_amount, show_decimals=True) }
-      - "user_asset_home_amount_owed": ${ thousands(user_asset_home_amount_owed, show_decimals=True) }
-      - "user_asset_other_real_estate": ${ user_asset_other_real_estate }
-      - "user_asset_other_real_estate_amount": ${ thousands(user_asset_other_real_estate_amount, show_decimals=True) }
-      - "user_asset_vehicle1": ${ user_asset_vehicle1 }
-      - "user_asset_vehicle1_paid_yes": ${ user_asset_vehicle1_paid }
-      - "user_asset_vehicle1_paid_no": ${ not user_asset_vehicle1_paid }
-      - "user_asset_vehicle1_amount": ${ thousands(user_asset_vehicle1_amount, show_decimals=True) }
-      - "user_asset_vehicle2_paid_yes": ${ user_asset_vehicle2_paid if user_asset_vehicle2 else '' }
-      - "user_asset_vehicle2_paid_no": ${ not user_asset_vehicle2_paid if user_asset_vehicle2 else '' }
-      - "user_asset_vehicle2": ${ user_asset_vehicle2 }
-      - "user_asset_vehicle2_amount": ${ thousands(user_asset_vehicle2_amount, show_decimals=True) if user_asset_vehicle2 else '' }
-      - "user_asset_other": ${ user_asset_other }
-      - "user_asset_other_amount_1":  |
-          % if not user_asset_none:
-          ${ thousands(user_asset_other_list[0].amount, show_decimals=True) }
-          % endif
-      - "user_asset_other_kind_1":  |
-          % if not user_asset_none:
-          ${ user_asset_other_list[0].name.text }
-          % endif
-      - "user_asset_other_amount_2":  |
-          % if not user_asset_none:
-          ${ thousands(user_asset_other_list[1].amount, show_decimals=True) }
-          % endif
-      - "user_asset_other_kind_2":  |
-          % if not user_asset_none:
-          ${ user_asset_other_list[1].name.text }
-          % endif
-      - "user_asset_other_amount_3":  |
-          % if not user_asset_none:
-          ${ thousands(user_asset_other_list[2].amount, show_decimals=True) }
-          % endif
-      - "user_asset_other_kind_3":  |
-          % if not user_asset_none:
-          ${ user_asset_other_list[2].name.text }
-          % endif
-      - "user_asset_none": ${ user_asset_none }
-      - "substantial_hardship_explanation": ${ substantial_hardship_explanation }
-      - "court_date_remote_cb": ${ True if court_choice == 'remote' else '' }
-      - "court_date_in_person_cb": ${ True if court_choice == 'person' else '' }
-      #- "relationship_to_minor": |
-      #    % if filing_basis != "filing_self":
-      #    ${ relationship_to_minor  }
-      #    % endif
-
-  - name: Cook waiver petition
-    filename: cook_waiver     
-    variable name: cook_waiver_attachment[i]        
-    skip undefined: True
-    pdf template file: waiver_application_cook.pdf
-    editable: False
-    fields:
-      - "defendant": ${ defendants[0].name.full(middle="full") }      
-      - "docket_number": ${ docket_number }
-      - "docket_number__1": ${ docket_number }
-      - "docket_number__2": ${ docket_number }
-      - "docket_number__3": ${ docket_number }
-      - "filing_self_cb": ${ True if filing_basis == "filing_self" else ""}
-      - "filing_obo_cb": ${ True if filing_basis != "filing_self" else ""}
-      - "user_name_full": ${ users[0].name.full(middle="full") }
-      - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
-      - "hide_address": |
-          % if filing_basis != "filing_self":
-          ${ hide_signer_address }
-          % else:
-          ${ hide_address }
-          % endif
-      - "signer_name_full": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].name.full(middle="full") }
-          % else:
-          ${ users[0].name.full(middle="full") }
-          % endif
-      - "user_address_one_line__2": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].address.on_one_line(bare=True) }
-          % else:
-          ${ users[0].address.on_one_line(bare=True) }
-          % endif
-      
-      - "signer_signature_no_slash": |
-          % if filing_basis != "filing_self":          
-          ${ signer[0].name.full(middle="full") if e_signature else '' }
-          % else:
-          ${ users[0].name.full(middle="full") if e_signature else ''  }
-          % endif
-      - "signer_email": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].email }
-          % elif users[0].has_email_address:
-          ${ users[0].email }
-          % endif
-#      - "signer_address_line_one": |
-#          % if filing_basis != "filing_self":
-#          ${ signer[0].address.line_one(bare=True) }
-#          % else:
-#          ${ users[0].address.line_one(bare=True) }
-#          % endif
-#      - "signer_address_city_state_zip": |
-#          % if filing_basis != "filing_self":
-#          ${ signer[0].address.line_two() }
-#          % else:
-#          ${ users[0].address.line_two() }
-#          % endif
       - "signer_phone_number": |
           % if filing_basis != "filing_self":
           ${ phone_number_formatted(signer[0].phone_numbers()) }
@@ -2965,20 +2548,6 @@ review:
       **Substantial hardship because**:
       > ${ substantial_hardship_explanation }
 
-  #- Edit: plaintiffs.revisit
-  #  button: |
-  #    **Plaintiffs / Petitioners:**
-#
-  #    % for item in plaintiffs:
-  #      * ${ item.name.full(middle="full") }
-  #    % endfor
-  #- Edit: defendants.revisit
-  #  button: |
-  #    **Defendants / Respondents:**
-#
-  #    % for item in defendants:
-  #      * ${ item.name.full(middle="full") }
-  #    % endfor
   - Edit: 
       - trial_court_index
       - recompute:
@@ -3078,69 +2647,6 @@ review:
       % if court_choice == 'person':
       * In person
       % endif
----
-#id: edit plaintiffs review screen
-#continue button field: plaintiffs.revisit
-#section: Court case info
-#question: |
-#  Edit plaintiffs
-#subquestion: |
-#  ${ plaintiffs.table }
-#
-#  ${ plaintiffs.add_action() }
-#---
-#table: plaintiffs.table
-#rows: plaintiffs
-#columns:
-#  - name: |
-#      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
-#edit:
-#  - name.first
-#confirm: True
-#---
-#id: edit defendants review screen
-#continue button field: defendants.revisit
-#section: Court case info
-#question: |
-#  Edit defendants
-#subquestion: |
-#  ${ defendants.table }
-#---
-#table: defendants.table
-#rows: defendants
-#columns:
-#  - name: |
-#      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
-#edit:
-#  - name.first
-#confirm: True
-
-#---
-#id: edit users review screen
-#continue button field: users.revisit
-#section: Details about person asking for a fee waiver
-#question: |
-#  Edit users
-#subquestion: |
-#  ${ users.table }
-#---
-#table: users.table
-#rows: users
-#columns:
-#  - Name: |
-#      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
-#edit:
-#  - name.first
-#confirm: True
-#---
-#table: other_parties.table
-#rows: other_parties
-#columns:
-#  - Name: |
-#      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
-#edit:
-#  - name.first
-#confirm: True
 ---
 id: edit signer review screen
 continue button field: signer.revisit
@@ -3623,20 +3129,6 @@ question: |
 subquestion: |
   Edit your answers below.
 review:
-  #  - Edit: plaintiffs.revisit
-  #    button: |
-  #      **Plaintiffs / Petitioners:**
-  #
-  #      % for item in plaintiffs:
-  #        * ${ item.name.full(middle="full") }
-  #      % endfor
-  #  - Edit: defendants.revisit
-  #    button: |
-  #      **Defendants / Respondents:**
-  #
-  #      % for item in defendants:
-  #        * ${ item.name.full(middle="full") }
-  #      % endfor
   - Edit: users[0].name.first
     button: |
       **Your name:**
