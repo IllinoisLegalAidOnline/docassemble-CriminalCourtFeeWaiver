@@ -96,8 +96,9 @@ code: |
   if filing_basis == "filing_self":
     users[0].has_email_address
   if filing_basis != "filing_self":
-    hide_signer_address
-    signer[0].address.address
+    if trial_court_index == "-1":
+      hide_signer_address
+      signer[0].address.address
     signer[0].has_email_address
 
   set_progress(90)
@@ -145,10 +146,10 @@ question: |
   In which county was this case filed?
 subquestion: |
   % if user_ask_role == "plaintiff":
-  If you are starting a new case, select the county where you will file.
+  If this is for a new case, select the county where it will be filed.
   % endif
 fields:
-  - no label: trial_court_index
+  - County: trial_court_index
     code: |
       court_county_lookup()
 ---
@@ -231,7 +232,7 @@ question: |
 subquestion: |
   After you download your forms, you must file them with the court. This program **does not file** your forms for you.
   
-  **Note:** in criminal cases you must file an Application for Waiver of Criminal Court Assessments **no later than 30 days after the sentencing date**. You are responsible for knowing if there are other deadlines to file the documents.
+  **Note:** In criminal cases you must file an Application for Waiver of Criminal Court Assessments **no later than 30 days after the sentencing date**. You are responsible for knowing if there are other deadlines to file the documents.
   
   To learn more, read the instructions you can download at the end of this program. 
 ---
@@ -307,8 +308,9 @@ fields:
   - no label: user_applied_for_benefits
     datatype: yesnoradio
 ---
-depends on:
-  - user_benefits
+#depends on:
+#  - user_benefits
+reconsider: True
 code: |
   user_receives_benefits = user_benefits.any_true()
 ---
@@ -1297,31 +1299,14 @@ fields:
     show if: 
       variable: filing_basis
       is: filing_on_behalf_of        
-  - Attorney number (if any): signer_attorney_number      
-    required: False
-    help: |
-      If you are an attorney licensed in Illinois, you can enter your number if filing on behalf of another person. Some jurisdictions like Cook or DuPage County require a firm or an individual attorney number.
-    maxlength: 20
-    show if: 
-      variable: filing_basis
-      is: filing_on_behalf_of
----
-id: birth year
-question: |
-  % if filing_basis == "filing_self":
-  What year were you born?
-  % else:
-  What year was ${ users[0].familiar() } born?
-  % endif
-fields:
-  - Year of birth: users[0].birth_year
-    input type: combobox
-    datatype: integer
-    maxlength: 4
-    min: ${ today().year-120 }
-    max: ${ today().year }
-    code: |
-      reversed(range(today().year-120, today().year+1))
+#  - Attorney number (if any): signer_attorney_number      
+#    required: False
+#    help: |
+#      If you are an attorney licensed in Illinois, you can enter your number if filing on behalf of another person. Some jurisdictions like Cook or DuPage County require a firm or an individual attorney number.
+#    maxlength: 20
+#    show if: 
+#      variable: filing_basis
+#      is: filing_on_behalf_of
 ---
 id: your contact information
 generic object: ALIndividual
@@ -1394,11 +1379,11 @@ subquestion: |
 fields:
   - no label: substantial_hardship_explanation
     datatype: area
-    rows: 13
-    maxlength: 800
+    rows: 16
+    maxlength: 1000
     required: False
   - note: |
-      The form has room for about **800 characters** including spaces.
+      The form has room for about **1,000 characters** including spaces.
 ---
 id: any other users
 question: |
@@ -1547,9 +1532,17 @@ question: |
   % endif
   % else:
   % if hide_address:
+  % if trial_court_index != "-1":
+  What is your mailing address?
+  % else:
   What is ${ users[0].familiar() }'s mailing address?
+  % endif
+  % else:
+  % if trial_court_index != "-1":
+  What is your home address?
   % else:
   What is ${ users[0].familiar() }'s home address?
+  % endif
   % endif
   % endif
 subquestion: |
@@ -1654,9 +1647,8 @@ subquestion: |
     <h6 class="alert-heading">What it means to sign your forms</h6>
     <p>By signing your <i>Application for Waiver of Criminal and/or Traffic Court Assessments</i>, you are certifying that:</p>
     <p><ul>
-      <li>Everything on the forms is true and correct, and</li>
-      <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
-    </ul></p>
+      <li>Everything on the form is true and correct, or you have been informed or believe it to be true and correct, and</li>
+      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
   % else:  
@@ -1664,9 +1656,8 @@ subquestion: |
     <h6 class="alert-heading">What it means to sign your forms</h6>
     <p>By signing your <i>Application for Waiver of Criminal Court Assessments</i>, you are certifying that:</p>
     <p><ul>
-      <li>Everything on the forms is true and correct, and</li>
-      <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
-    </ul></p>
+      <li>Everything on the form is true and correct, or you have been informed or believe it to be true and correct, and</li>
+      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
   % endif
@@ -1893,26 +1884,14 @@ attachments:
       - "filing_self_cb": ${ True if filing_basis == "filing_self" else ""}
       - "filing_obo_cb": ${ True if filing_basis != "filing_self" else ""}
       - "user_name_full": ${ users[0].name_full() }
-      - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
-      - "hide_address": |
-          % if filing_basis != "filing_self":
-          ${ hide_signer_address }
-          % else:
-          ${ hide_address }
-          % endif
       - "signer_name_full": |
           % if filing_basis != "filing_self":
           ${ signer[0].name_full() }
           % else:
           ${ users[0].name_full() }
           % endif
-      - "user_address_one_line__2": |
-          % if filing_basis != "filing_self":
-          ${ signer[0].address.on_one_line(bare=True) }
-          % else:
-          ${ users[0].address.on_one_line(bare=True) }
-          % endif
-
+      - "user_address_one_line__2": ${ users[0].address.on_one_line(bare=True) }
+      - "for_self": ${ True }
       - "signer_signature_no_slash": |
           % if filing_basis != "filing_self":          
           ${ signer[0].name_full() if e_signature else '' }
@@ -1931,10 +1910,10 @@ attachments:
           % else:
           ${ phone_number_formatted(users[0].phone_numbers()) }
           % endif
-      - "signer_attorney_number": |
-          % if filing_basis != "filing_self" and signer_attorney_number:          
-          ${ signer_attorney_number }
-          % endif
+#      - "signer_attorney_number": |
+#          % if filing_basis != "filing_self" and signer_attorney_number:          
+#          ${ signer_attorney_number }
+#          % endif
       - "user_dependents_adults": |
           % if user_has_dependents:
           ${ user_dependents_adults }
@@ -2162,7 +2141,10 @@ attachments:
           ${ user_expense_other_list[2].name.text }
           % endif
       - "user_expense_none": ${ user_expense_none }
-      - "user_expense_total": ${ thousands(user_expense_total, show_decimals=True) }
+      - "user_expense_total": |
+          % if not user_expense_none:
+          ${ thousands(user_expense_total, show_decimals=True) }
+          % endif
       - "user_asset_bank_account": ${ user_asset_bank_account }
       - "user_asset_bank_account_amount": ${ thousands(user_asset_bank_account_amount, show_decimals=True) }
       - "user_asset_home": ${ user_asset_home }
@@ -2225,12 +2207,7 @@ attachments:
       - "filing_obo_cb": ${ True if filing_basis != "filing_self" else ""}
       - "user_name_full": ${ users[0].name_full() }
       - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
-      - "hide_address": |
-          % if filing_basis != "filing_self":
-          ${ hide_signer_address }
-          % else:
-          ${ hide_address }
-          % endif
+      - "for_self": ${ True }
       - "signer_name_full": |
           % if filing_basis != "filing_self":
           ${ signer[0].name_full() }
@@ -2262,10 +2239,10 @@ attachments:
           % else:
           ${ phone_number_formatted(users[0].phone_numbers()) }
           % endif
-      - "signer_attorney_number": |
-          % if filing_basis != "filing_self" and signer_attorney_number:          
-          ${ signer_attorney_number }
-          % endif
+#      - "signer_attorney_number": |
+#          % if filing_basis != "filing_self" and signer_attorney_number:          
+#          ${ signer_attorney_number }
+#          % endif
       - "user_dependents_adults": |
           % if user_has_dependents:
           ${ user_dependents_adults }
@@ -2493,7 +2470,10 @@ attachments:
           ${ user_expense_other_list[2].name.text }
           % endif
       - "user_expense_none": ${ user_expense_none }
-      - "user_expense_total": ${ thousands(user_expense_total, show_decimals=True) }
+      - "user_expense_total": |
+          % if not user_expense_none:
+          ${ thousands(user_expense_total, show_decimals=True) }
+          % endif
       - "user_asset_bank_account": ${ user_asset_bank_account }
       - "user_asset_bank_account_amount": ${ thousands(user_asset_bank_account_amount, show_decimals=True) }
       - "user_asset_home": ${ user_asset_home }
@@ -2895,7 +2875,7 @@ review:
   - Edit: substantial_hardship_explanation
     button: |
       **Substantial hardship because**:
-      > ${ substantial_hardship_explanation }
+      ${ substantial_hardship_explanation }
 
   - Edit: 
       - trial_court_index
@@ -2915,7 +2895,11 @@ review:
   - Edit: hide_address
     button: |
       % if filing_basis != "filing_self":
+      % if trial_court_index == "-1":
       **Do you want to keep ${ users[0].familiar() }'s address hidden?**
+      % else:
+      **Do you want to keep your address hidden?**
+      % endif
       % else:
       **Do you want to keep your address hidden?**
       % endif
@@ -2923,7 +2907,11 @@ review:
   - Edit: users[0].address.address
     button: |
       % if filing_basis != "filing_self":
+      % if trial_court_index == "-1":
       **${ users[0].familiar() }'s address:**
+      % else:
+      **Your address:**
+      % endif      
       % else:
       **Your address:**
       % endif
@@ -3526,7 +3514,7 @@ review:
   - Edit: substantial_hardship_explanation
     button: |
       **Substantial hardship because**:
-      > ${ substantial_hardship_explanation }
+      ${ substantial_hardship_explanation }
   - Edit: user_has_dependents
     button: |
       **Supporting any dependents in same household?**
@@ -3543,7 +3531,11 @@ review:
   - Edit: hide_address
     button: |
       % if filing_basis != "filing_self":
+      % if trial_court_index == "-1":
       **Do you want to keep ${ users[0].familiar() }'s address hidden?**
+      % else:
+      **Do you want to keep your address hidden?**
+      % endif
       % else:
       **Do you want to keep your address hidden?**
       % endif
@@ -3551,7 +3543,11 @@ review:
   - Edit: users[0].address.address
     button: |
       % if filing_basis != "filing_self":
+      % if trial_court_index == "-1":
       **${ users[0].familiar() }'s address:**
+      % else:
+      **Your address:**
+      % endif      
       % else:
       **Your address:**
       % endif
