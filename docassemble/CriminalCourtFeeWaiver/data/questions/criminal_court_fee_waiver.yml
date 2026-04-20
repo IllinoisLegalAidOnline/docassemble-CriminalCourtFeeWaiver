@@ -630,8 +630,9 @@ code: |
   def get_income_total():
     income_sum = 0
 
-    if user_receives_benefits:
-      return income_sum
+    if trial_court_index != "-1":
+      if user_receives_benefits:
+        return income_sum
   
     if not user_income_none:
       if user_income_pension:
@@ -867,10 +868,11 @@ code: |
   def get_annual_total():
     annual_sum = 0
   
-    if user_receives_benefits:
-      return annual_sum
+    if trial_court_index != "-1":
+      if user_receives_benefits:
+        return annual_sum
   
-    if not user_asset_none:
+    if not user_annual_none:
       if user_annual_pension:
         annual_sum += user_annual_pension_amount
       if user_annual_unemployment:
@@ -1463,8 +1465,8 @@ subquestion: |
   is based only on ${ your_or_their } income.
   
   You said ${ your_or_their } income in the past month was 
-  ${ currency(user_income_total) }, and ${ your_or_their} income over the last 12 months was 
-  ${ currency(user_annual_total) } (${ currency(user_annual_total/12) }
+  ${ currency(get_income_total()) }, and ${ your_or_their} income over the last 12 months was 
+  ${ currency(get_annual_total()) } (${ currency(get_annual_total()/12) }
   per month). The judge will look at income from last month and the average monthly income over the last 12 months.
   
   For a **full waiver**, with ${ your_or_their} household size, ${ your_or_their } monthly income needs to be at or below 
@@ -3403,6 +3405,9 @@ review:
     button: |
       **Substantial hardship because**:
       ${ substantial_hardship_explanation }
+
+
+      
   - Edit: hide_address
     button: |
       % if filing_basis != "filing_self":
@@ -3442,6 +3447,8 @@ review:
       **Your address:**
       ${ signer[0].address.on_one_line(bare=True) }
     show if: filing_basis != "filing_self"
+
+  
   - Edit: signer[0].has_email_address
     button: |
       **Your phone number**:
@@ -4142,6 +4149,7 @@ review:
       **Your address:**
       ${ signer[0].address.on_one_line(bare=True) }
     show if: filing_basis != "filing_self"
+  
   - Edit: signer[0].has_email_address
     button: |
       **Your phone number**:
