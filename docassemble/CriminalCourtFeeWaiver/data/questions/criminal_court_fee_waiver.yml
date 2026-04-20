@@ -79,8 +79,12 @@ code: |
     if not user_asset_none:
       if user_asset_other:
         user_asset_other_list.gather()
-    if not poverty_scale_get_income_limit(household_size=household_size, multiplier=1.25) is None:
+    if not poverty_scale_get_income_limit(household_size=household_size, multiplier=2.0) is None:
       show_qualification_guess
+  user_income_total
+  user_annual_total
+  user_expense_total
+  user_asset_total  
     
   set_progress(50)
   nav.set_section('section_case_info')
@@ -252,11 +256,15 @@ subquestion: |
   You can use this program to make waiver forms if you have to pay assessments in a **criminal case** in Circuit Court anywhere in Illinois.
 
   You can also use this program to make waiver forms if you have to pay assessments in Cook County for **traffic and petty offenses** in Schedules 2, 6, 9, 10, and 13 of [**Article 15 of the Criminal and Traffic Assessment Act**](https://www.ilga.gov/legislation/ilcs/ilcs4.asp?DocName=070501350HArt%2E+15&ActID=3898&ChapterID=50&SeqStart=1100000&SeqEnd=2700000).  
-  There are different fee waiver forms to use if:
+  There are **different fee waiver forms** to use if:
 
-  * Your case is a **civil case** like a divorce or other family law case, or an eviction, debt collection, small claims, foreclosure, or lawsuit for injury or property damage. This includes cases to expunge or seal criminal records. If you need to ask for a fee waiver in a civil case, use the [**Fee waiver Easy Form**](https://www.illinoislegalaid.org/node/30831).
-  * Your case is in the Appellate Court. If you need to ask for a fee waiver in an Appellate case, use the [**Fee waiver - Appellate Court Easy Form**](https://www.illinoislegalaid.org/node/88446). 
+
+  * Your case is a **civil case** in the circuit court. This is also called the trial court, and it is where most cases start. Examples of circuit court cases are divorce, family law, evictions, small claims, foreclosures, and lawsuits for injury or property damage. Asking a judge to expunge or seal a criminal case is also started in circuit court. If you need to ask for a fee waiver in a circuit court case, use the [**Fee waiver Easy Form**](https://www.illinoislegalaid.org/node/30831)
+  
+  * Your case is in the Appellate Court. If you need to ask for a fee waiver in an Appellate case, use the [**Fee waiver - Appellate Court Easy Form**](https://www.illinoislegalaid.org/node/88446).
+  
   * Your case is in the Illinois Supreme Court. If you need to ask for a fee waiver in a Supreme Court case, use the [**Fee waiver - Supreme Court of Illinois Easy Form**](https://www.illinoislegalaid.org/node/158696).
+
 ---
 id: Do you receive any benefits
 question: |
@@ -271,6 +279,8 @@ subquestion: |
   % else:
   Check any benefits that ${ users[0].familiar() } currently receives.
   % endif
+
+  **Note:** Medicaid works differently than these benefits. If ${you_or_they} are on Medicaid and want to include this in ${your_or_their} fee waiver application, you can explain it on another screen.
 fields:
   - no label: user_benefits
     datatype: checkboxes
@@ -304,6 +314,8 @@ subquestion: |
   * TANF - Temporary Assistance to Needy Families
   * SNAP - Supplemental Nutrition Assitance Program (Food Stamps)
   * General Assistance Program (GA), Transitional Assistance, or State Children and Family Assistance
+
+  **Note:** Medicaid works differently than these benefits. If ${you_or_they} are on Medicaid and want to include this in ${your_or_their} fee waiver application, you can explain it on another screen.
 fields:
   - no label: user_applied_for_benefits
     datatype: yesnoradio
@@ -406,14 +418,14 @@ question: |
   % endif
 subquestion: |
   % if filing_basis == "filing_self":
-  Click **Yes** if your household members rely on you for money or to pay their bills.  
+  Click **Yes** if other household members rely on you for money or to pay their bills. Do not include yourself.
   % else:
-  Click **Yes** if ${ users[0].familiar() }'s household members rely on ${ users[0].familiar() } for money or to pay their bills.
+  Click **Yes** if ${ users[0].familiar() }'s household members rely on ${ users[0].familiar() } for money or to pay their bills. Do not include ${ users[0].familiar() }.
   % endif  
 fields:
-  - Support household members: user_has_dependents
+  - Support other household members: user_has_dependents
     datatype: yesnoradio
-  - Number of adults supported: user_dependents_adults
+  - Number of other adults supported: user_dependents_adults
     datatype: integer
     min: 0
     show if: user_has_dependents
@@ -561,33 +573,82 @@ code: |
   if user_income_other_list.number_gathered() >= 3:
     user_income_other_list.there_is_another = False
 ---
+# depends on:
+#   - user_income_other_list[0].amount
+#   - user_income_other_list[1].amount
+#   - user_income_other_list[2].amount
+#   - user_income_household_amount
+#   - user_income_ss_amount
+#   - user_income_employment_amount
+#   - user_income_child_support_amount
+#   - user_income_unemployment_amount'
+#   - user_income_pension_amount 
+# code: |
+#   def sum_if_defined(*pargs):
+#     total = 0
+#     for source in pargs:
+#       if defined(source):
+#         total += value(source)
+#     return total        
+#   
+#   user_income_total = sum_if_defined('user_income_other_list[0].amount', 
+#       'user_income_other_list[1].amount',
+#       'user_income_other_list[2].amount',
+#       'user_income_household_amount',
+#       'user_income_ss_amount',
+#       'user_income_employment_amount',
+#       'user_income_child_support_amount',
+#       'user_income_unemployment_amount',
+#       'user_income_pension_amount')
+---
 depends on:
+  - user_income_other
+  - user_income_household
+  - user_income_ss
+  - user_income_employment
+  - user_income_child_support
+  - user_income_unemployment
+  - user_income_pension 
+
   - user_income_other_list[0].amount
   - user_income_other_list[1].amount
-  - user_income_other_list[2].amount
   - user_income_household_amount
   - user_income_ss_amount
   - user_income_employment_amount
   - user_income_child_support_amount
-  - user_income_unemployment_amount'
-  - user_income_pension_amount 
+  - user_income_unemployment_amount
+  - user_income_pension_amount
 code: |
-  def sum_if_defined(*pargs):
-    total = 0
-    for source in pargs:
-      if defined(source):
-        total += value(source)
-    return total        
+  user_income_total = get_income_total()
+---
+code: |
+  def get_income_total():
+    income_sum = 0
+
+    if user_receives_benefits:
+      return income_sum
   
-  user_income_total = sum_if_defined('user_income_other_list[0].amount', 
-      'user_income_other_list[1].amount',
-      'user_income_other_list[2].amount',
-      'user_income_household_amount',
-      'user_income_ss_amount',
-      'user_income_employment_amount',
-      'user_income_child_support_amount',
-      'user_income_unemployment_amount',
-      'user_income_pension_amount')
+    if not user_income_none:
+      if user_income_pension:
+        income_sum += user_income_pension_amount
+      if user_income_unemployment:
+        income_sum += user_income_unemployment_amount
+      if user_income_child_support:
+        income_sum += user_income_child_support_amount
+      if user_income_employment:
+        income_sum += user_income_employment_amount
+      if user_income_ss:
+        income_sum += user_income_ss_amount
+      if user_income_household:
+        income_sum += user_income_household_amount
+      if user_income_other:
+        income_sum += user_income_other_list[0].amount
+        if user_income_other_list.number() > 1:
+          income_sum += user_income_other_list[1].amount
+          if user_income_other_list.number() > 2:
+            income_sum += user_income_other_list[2].amount
+
+    return income_sum
 ---
 id: What income did you receive in the last year
 question: |
@@ -607,9 +668,9 @@ subquestion: |
 fields:
   - label: |
       % if filing_basis == "filing_self":
-      I did not have any income in the last 12 months
+      I did not have any income in the last 12 months.
       % else:
-      ${ users[0].familiar() } did not have any income over the last 12 months
+      ${ users[0].familiar() } did not have any income over the last 12 months.
       % endif
     field: user_annual_none
     datatype: yesnowide
@@ -754,28 +815,77 @@ code: |
   if user_annual_other_list.number_gathered() >= 3:
     user_annual_other_list.there_is_another = False
 ---
+#depends on:
+#  - user_annual_other_list[0].amount
+#  - user_annual_other_list[1].amount
+#  - user_annual_other_list[2].amount
+#  - user_annual_household_amount
+#  - user_annual_ss_amount
+#  - user_annual_employment_amount
+#  - user_annual_child_support_amount
+#  - user_annual_unemployment_amount'
+#  - user_annual_pension_amount 
+#code: |
+#  user_annual_total = sum_if_defined(
+#      'user_annual_child_support_amount',
+#      'user_annual_employment_amount',
+#      'user_annual_household_amount',
+#      'user_annual_pension_amount',
+#      'user_annual_ss_amount',
+#      'user_annual_unemployment_amount',
+#      'user_annual_other_list[0].amount',
+#      'user_annual_other_list[1].amount',
+#      'user_annual_other_list[2].amount'
+#  )
+---
 depends on:
+  - user_annual_other
+  - user_annual_household
+  - user_annual_ss
+  - user_annual_employment
+  - user_annual_child_support
+  - user_annual_unemployment
+  - user_annual_pension 
+
   - user_annual_other_list[0].amount
   - user_annual_other_list[1].amount
-  - user_annual_other_list[2].amount
   - user_annual_household_amount
   - user_annual_ss_amount
   - user_annual_employment_amount
   - user_annual_child_support_amount
-  - user_annual_unemployment_amount'
+  - user_annual_unemployment_amount
   - user_annual_pension_amount 
 code: |
-  user_annual_total = sum_if_defined(
-      'user_annual_child_support_amount',
-      'user_annual_employment_amount',
-      'user_annual_household_amount',
-      'user_annual_pension_amount',
-      'user_annual_ss_amount',
-      'user_annual_unemployment_amount',
-      'user_annual_other_list[0].amount',
-      'user_annual_other_list[1].amount',
-      'user_annual_other_list[2].amount'
-  )
+  user_annual_total = get_annual_total()
+---
+code: |
+  def get_annual_total():
+    annual_sum = 0
+  
+    if user_receives_benefits:
+      return annual_sum
+  
+    if not user_asset_none:
+      if user_annual_pension:
+        annual_sum += user_annual_pension_amount
+      if user_annual_unemployment:
+        annual_sum += user_annual_unemployment_amount
+      if user_annual_child_support:
+        annual_sum += user_annual_child_support_amount
+      if user_annual_employment:
+        annual_sum += user_annual_employment_amount
+      if user_annual_ss:
+        annual_sum += user_annual_ss_amount
+      if user_annual_household:
+        annual_sum += user_annual_household_amount
+      if user_annual_other:
+        annual_sum += user_annual_other_list[0].amount
+        if user_annual_other_list.number() > 1:
+          annual_sum += user_annual_other_list[1].amount
+          if user_annual_other_list.number() > 2:
+            annual_sum += user_annual_other_list[2].amount
+
+    return annual_sum
 ---
 id: What expenses do you have right now
 question: |
@@ -964,7 +1074,48 @@ code: |
   if user_expense_other_list.number_gathered() >= 3:
     user_expense_other_list.there_is_another = False
 ---
+# depends on:
+#   - user_expense_car_amount
+#   - user_expense_child_support_amount
+#   - user_expense_childcare_amount
+#   - user_expense_food_amount
+#   - user_expense_medical_amount
+#   - user_expense_mortgage_amount
+#   - user_expense_other_mortgage_amount
+#   - user_expense_rent_amount
+#   - user_expense_utilities_amount
+#   - user_expense_other_list[0].amount
+#   - user_expense_other_list[1].amount
+#   - user_expense_other_list[2].amount
+# code: |
+#   user_expense_total = sum_if_defined(
+#       'user_expense_car_amount',
+#       'user_expense_child_support_amount',
+#       'user_expense_childcare_amount',
+#       'user_expense_food_amount',
+#       'user_expense_medical_amount',
+#       'user_expense_mortgage_amount',
+#       'user_expense_other_mortgage_amount',
+#       'user_expense_rent_amount',
+#       'user_expense_utilities_amount',
+#       'user_expense_other_list[0].amount',
+#       'user_expense_other_list[1].amount',
+#       'user_expense_other_list[2].amount'
+#     )
+---
 depends on:
+  - user_expense_car
+  - user_expense_child_support
+  - user_expense_childcare
+  - user_expense_food
+  - user_expense_medical
+  - user_expense_mortgage
+  - user_expense_other_mortgage
+  - user_expense_rent
+  - user_expense_utilities
+  - user_expense_other
+  - user_expense_none
+
   - user_expense_car_amount
   - user_expense_child_support_amount
   - user_expense_childcare_amount
@@ -976,22 +1127,48 @@ depends on:
   - user_expense_utilities_amount
   - user_expense_other_list[0].amount
   - user_expense_other_list[1].amount
-  - user_expense_other_list[2].amount
 code: |
-  user_expense_total = sum_if_defined(
-      'user_expense_car_amount',
-      'user_expense_child_support_amount',
-      'user_expense_childcare_amount',
-      'user_expense_food_amount',
-      'user_expense_medical_amount',
-      'user_expense_mortgage_amount',
-      'user_expense_other_mortgage_amount',
-      'user_expense_rent_amount',
-      'user_expense_utilities_amount',
-      'user_expense_other_list[0].amount',
-      'user_expense_other_list[1].amount',
-      'user_expense_other_list[2].amount'
-    )
+  user_expense_total = get_expense_total()
+
+---
+code: |
+  def get_expense_total():
+    expense_sum = 0
+
+    if user_receives_benefits:
+      return expense_sum
+  
+    if not user_expense_none:
+      if user_expense_car:
+        expense_sum += user_expense_car_amount
+      if user_expense_child_support:
+        expense_sum += user_expense_child_support_amount
+      if user_expense_car:
+        expense_sum += user_expense_car_amount
+      if user_expense_child_support:
+        expense_sum += user_expense_child_support_amount
+      if user_expense_childcare:
+        expense_sum += user_expense_childcare_amount
+      if user_expense_food:
+        expense_sum += user_expense_food_amount
+      if user_expense_medical:
+        expense_sum += user_expense_medical_amount
+      if user_expense_mortgage:
+        expense_sum += user_expense_mortgage_amount
+      if user_expense_other_mortgage:
+        expense_sum += user_expense_other_mortgage_amount
+      if user_expense_rent:
+        expense_sum += user_expense_rent_amount
+      if user_expense_utilities:
+        expense_sum += user_expense_utilities_amount
+      if user_expense_other:
+        expense_sum += user_expense_other_list[0].amount
+        if user_expense_other_list.number() > 1:
+          expense_sum += user_expense_other_list[1].amount
+          if user_expense_other_list.number() > 2:
+            expense_sum += user_expense_other_list[2].amount
+
+    return expense_sum
 ---
 depends on: filing_basis
 code: |
