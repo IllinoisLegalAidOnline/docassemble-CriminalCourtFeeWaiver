@@ -95,13 +95,13 @@ code: |
   set_progress(75)
   nav.set_section('section_about_you')
   substantial_hardship_explanation
-  hide_address
+  #hide_address
   users[0].address.address
   if filing_basis == "filing_self":
     users[0].has_email_address
   if filing_basis != "filing_self":
     if trial_court_index == "-1":
-      hide_signer_address
+      #hide_signer_address
       signer[0].address.address
     signer[0].has_email_address
 
@@ -1417,52 +1417,9 @@ code: |
 id: show_qualification_guess
 continue button field: show_qualification_guess
 question: |
-  % if last_month_income_qualifies or last_year_income_qualifies:
-  % if filing_basis == "filing_self":
-  You may qualify for a full waiver
-  % else:
-  ${ users[0].familiar() } may qualify for a full waiver
-  % endif
-  % else:
-  % if last_month_income_qualifies_partial or last_year_income_qualifies_partial:
-  % if filing_basis == "filing_self":
-  You may qualify for a partial waiver
-  % else:
-  ${ users[0].familiar() } may qualify for a parital waiver
-  % endif
-  % else:
-  % if filing_basis == "filing_self":
-  You likely do not qualify
-  % else:
-  ${ users[0].familiar() } likely does not qualify
-  % endif
-  % endif
-  % endif
+  How to qualify for a waiver
 subquestion: |
-  % if last_month_income_qualifies or last_year_income_qualifies:
-  % if filing_basis == "filing_self":  
-  #### Why we think that you may qualify for a full waiver
-  % else:
-  #### Why we think ${ users[0].familiar() } may qualify for a full waiver
-  % endif
-  % else:
-  % if last_month_income_qualifies_partial or last_year_income_qualifies_partial:
-  % if filing_basis == "filing_self":
-  #### Why we think that you may qualify for a partial waiver
-  % else:
-  #### Why we think ${ users[0].familiar() } may qualify for a parital waiver
-  % endif
-  % else:
-  % if filing_basis == "filing_self":
-  #### Why we think that you may not qualify
-  % else:
-  #### Why we think ${ users[0].familiar() } may not qualify
-  % endif
-  % endif
-  % endif
-  
-  The judge will consider ${ your_or_their } income, assets, and expenses. Our prediction
-  is based only on ${ your_or_their } income.
+  The judge will consider ${ your_or_obo_possessive } income, assets, and expenses.
   
   You said ${ your_or_their } income in the past month was 
   ${ currency(get_income_total()) }, and ${ your_or_their} income over the last 12 months was 
@@ -1764,40 +1721,52 @@ sets:
   - users[0].address.zip
 question: |
   % if filing_basis == "filing_self":
-  % if hide_address:
-  What is your mailing address?
+  What is your address?
   % else:
-  What is your home address?
+  What is  ${ users[0].familiar() }'s address?
   % endif
-  % else:
-  % if hide_address:
-  % if trial_court_index != "-1":
-  What is your mailing address?
-  % else:
-  What is ${ users[0].familiar() }'s mailing address?
-  % endif
-  % else:
-  % if trial_court_index != "-1":
-  What is your home address?
-  % else:
-  What is ${ users[0].familiar() }'s home address?
-  % endif
-  % endif
-  % endif
+
+#  % if filing_basis == "filing_self":
+#  % if hide_address:
+#  What is your mailing address?
+#  % else:
+#  What is your home address?
+#  % endif
+#  % else:
+#  % if hide_address:
+#  % if trial_court_index != "-1":
+#  What is your mailing address?
+#  % else:
+#  What is ${ users[0].familiar() }'s mailing address?
+#  % endif
+#  % else:
+#  % if trial_court_index != "-1":
+#  What is your home address?
+#  % else:
+#  What is ${ users[0].familiar() }'s home address?
+#  % endif
+#  % endif
+#  % endif
 subquestion: |
   % if filing_basis == "filing_self":
-  % if hide_address:
   **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
   % else:
-  **This address will appear on your court papers.** If you do not want this, click **Back** to keep this address hidden.
+    **This address will appear on ${ users[0].familiar() }'s court papers.** They may receive court notices and documents about your case at this address.
   % endif
-  % else:
-  % if hide_address:
-  **This address will appear on ${ users[0].familiar() }'s court papers.**
-  % else:
-  **This address will appear on ${ users[0].familiar() }'s court papers.** If you do not want this, click **Back** to keep this address hidden.
-  % endif
-  % endif
+
+#  % if filing_basis == "filing_self":
+#  % if hide_address:
+#  **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
+#  % else:
+#  **This address will appear on your court papers.** If you do not want this, click **Back** to keep this address hidden.
+#  % endif
+#  % else:
+#  % if hide_address:
+#  **This address will appear on ${ users[0].familiar() }'s court papers.**
+#  % else:
+#  **This address will appear on ${ users[0].familiar() }'s court papers.** If you do not want this, click **Back** to keep this address hidden.
+#  % endif
+#  % endif
 fields:
   - Street address: users[0].address.address
     address autocomplete: True
@@ -1817,17 +1786,19 @@ sets:
   - signer[0].address.city
   - signer[0].address.zip
 question: |
-  % if hide_signer_address:
-  What is your mailing address?
-  % else:
-  What is your home address?
-  % endif
+  What is your address?
+#  % if hide_signer_address:
+#  What is your mailing address?
+#  % else:
+#  What is your home address?
+#  % endif
 subquestion: |
-  % if hide_signer_address:
   **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
-  % else:
-  **This address will appear on your court papers.** If you do not want this, click **Back** to keep your address hidden.
-  % endif
+#  % if hide_signer_address:
+#  **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
+#  % else:
+#  **This address will appear on your court papers.** If you do not want this, click **Back** to keep your address hidden.
+#  % endif
 fields:
   - Street address: signer[0].address.address
     address autocomplete: True
@@ -1887,7 +1858,7 @@ subquestion: |
     <p>By signing your <i>Application for Waiver of Criminal and/or Traffic Court Assessments</i>, you are certifying that:</p>
     <p><ul>
       <li>Everything on the form is true and correct, or you have been informed or believe it to be true and correct, and</li>
-      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li>
+      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li></ul></p>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Illinois Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
   % else:  
@@ -1896,7 +1867,7 @@ subquestion: |
     <p>By signing your <i>Application for Waiver of Criminal Court Assessments</i>, you are certifying that:</p>
     <p><ul>
       <li>Everything on the form is true and correct, or you have been informed or believe it to be true and correct, and</li>
-      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li>
+      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li></ul></p>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Illinois Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
   % endif
@@ -3408,18 +3379,18 @@ review:
 
 
       
-  - Edit: hide_address
-    button: |
-      % if filing_basis != "filing_self":
-      % if trial_court_index == "-1":
-      **Do you want to keep ${ users[0].familiar() }'s address hidden?**
-      % else:
-      **Do you want to keep your address hidden?**
-      % endif
-      % else:
-      **Do you want to keep your address hidden?**
-      % endif
-      ${ word(yesno(hide_address)) }
+#  - Edit: hide_address
+#    button: |
+#      % if filing_basis != "filing_self":
+#      % if trial_court_index == "-1":
+#      **Do you want to keep ${ users[0].familiar() }'s address hidden?**
+#      % else:
+#      **Do you want to keep your address hidden?**
+#      % endif
+#      % else:
+#      **Do you want to keep your address hidden?**
+#      % endif
+#      ${ word(yesno(hide_address)) }
   - Edit: users[0].address.address
     button: |
       % if filing_basis != "filing_self":
@@ -3437,11 +3408,11 @@ review:
       **Your name:**
       ${ signer[0].name_full() }
     show if: filing_basis != "filing_self"
-  - Edit: hide_signer_address
-    button: |
-      **Do you want to keep your address hidden?**
-      ${ word(yesno(hide_signer_address)) }
-    show if: filing_basis != "filing_self"
+#  - Edit: hide_signer_address
+#    button: |
+#      **Do you want to keep your address hidden?**
+#      ${ word(yesno(hide_signer_address)) }
+#    show if: filing_basis != "filing_self"
   - Edit: signer[0].address.address
     button: |
       **Your address:**
@@ -4110,18 +4081,18 @@ review:
       **Number of minor dependents**:
       ${ user_dependents_children }
 
-  - Edit: hide_address
-    button: |
-      % if filing_basis != "filing_self":
-      % if trial_court_index == "-1":
-      **Do you want to keep ${ users[0].familiar() }'s address hidden?**
-      % else:
-      **Do you want to keep your address hidden?**
-      % endif
-      % else:
-      **Do you want to keep your address hidden?**
-      % endif
-      ${ word(yesno(hide_address)) }
+#  - Edit: hide_address
+#    button: |
+#      % if filing_basis != "filing_self":
+#      % if trial_court_index == "-1":
+#      **Do you want to keep ${ users[0].familiar() }'s address hidden?**
+#      % else:
+#      **Do you want to keep your address hidden?**
+#      % endif
+#      % else:
+#      **Do you want to keep your address hidden?**
+#      % endif
+#      ${ word(yesno(hide_address)) }
   - Edit: users[0].address.address
     button: |
       % if filing_basis != "filing_self":
@@ -4139,11 +4110,11 @@ review:
       **Your name:**
       ${ signer[0].name_full() }
     show if: filing_basis != "filing_self"
-  - Edit: hide_signer_address
-    button: |
-      **Do you want to keep your address hidden?**
-      ${ word(yesno(hide_signer_address)) }
-    show if: filing_basis != "filing_self"
+#  - Edit: hide_signer_address
+#    button: |
+#      **Do you want to keep your address hidden?**
+#      ${ word(yesno(hide_signer_address)) }
+#    show if: filing_basis != "filing_self"
   - Edit: signer[0].address.address
     button: |
       **Your address:**
