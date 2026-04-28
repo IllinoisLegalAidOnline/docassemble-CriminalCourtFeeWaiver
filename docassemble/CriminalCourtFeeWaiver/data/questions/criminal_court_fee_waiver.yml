@@ -446,14 +446,16 @@ question: |
   % else:
   What income did ${ users[0].familiar() } receive in the last month?
   % endif
-subquestion: |
-  List the amount of income received before taxes.
+subquestion: | 
+  If entering an amount, list the income received **before taxes**.
+
+  <span style="color: red;">*</span>You must select at least one option.
 fields:
   - label: |
       % if filing_basis == "filing_self":
-      I do not have any income
+      I do not have any income.
       % else:
-      ${ users[0].familiar() } does not have any income
+      ${ users[0].familiar() } does not have any income.
       % endif
     field: user_income_none
     datatype: yesnowide
@@ -663,14 +665,15 @@ question: |
   % else:
   What income did ${ users[0].familiar() } get in the last 12 months?
   % endif
-subquestion: |
+subquestion: |  
   Enter the actual amount received **over the last 12 months** for each kind
-  of income. List the amount of income received before taxes.
+  of income. List the amount of income received **before taxes**.
   
   **Note:** We used the information you gave us about income from
   last month and multiplied it by 12 as a starting point. Look it over carefully
   and make any corrections you need.
 
+  <span style="color: red;">*</span>You must select at least one option.
 fields:
   - label: |
       % if filing_basis == "filing_self":
@@ -909,12 +912,14 @@ subquestion: |
   % else:
   If ${ users[0].familiar() } shares expenses with someone, list only the amount that ${ users[0].familiar() } pays.
   % endif
+  
+  <span style="color: red;">*</span>You must select at least one option.
 fields:
   - label: |
       % if filing_basis == "filing_self":
-      I do not have any expenses
+      I do not have any expenses.
       % else:
-      ${ users[0].familiar() } does not have any expenses
+      ${ users[0].familiar() } does not have any expenses.
       % endif
     field: user_expense_none
     datatype: yesnowide
@@ -1142,8 +1147,9 @@ code: |
   def get_expense_total():
     expense_sum = 0
 
-    if user_receives_benefits:
-      return expense_sum
+    if trial_court_index != "-1":
+      if user_receives_benefits:
+        return expense_sum
   
     if not user_expense_none:
       if user_expense_car:
@@ -1204,6 +1210,8 @@ subquestion: |
   % else:
   Assets are things ${ users[0].familiar() } owns, like money, their property, and other belongings.
   % endif
+
+  <span style="color: red;">*</span>You must select at least one option.
 fields:
   - "No assets": user_asset_none
     datatype: yesnowide
