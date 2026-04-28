@@ -1,17 +1,12 @@
-license = "MIT"
-license-files = [
-    "LICENSE",
-]
-
 [build-system]
 requires = [
-    "setuptools==80.9.0",
+    "setuptools>=80.9.0",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "docassemble.CriminalCourtFeeWaiver"
-version = "1.1.4"
+version = "1.1.9"
 description = "A docassemble extension."
 readme = "README.md"
 authors = [
