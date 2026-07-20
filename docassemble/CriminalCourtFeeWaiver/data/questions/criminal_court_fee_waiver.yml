@@ -180,7 +180,7 @@ question: |
 subquestion: |
   Welcome to Illinois Legal Aid Online's **Criminal Court fee waiver** Easy Form.
   
-  This program creates a form that asks the court to waive or reduce criminal court assessments. You can also use it to ask the court to waive or reduce traffic court assessments in Cook County, Illinois.
+  This program makes an *${ form_name }* that asks the court to waive or reduce criminal court assessments. You can also use it to ask the court to waive or reduce traffic court assessments in Cook County, Illinois.
   
   Criminal or traffic court assessments are **costs charged to a defendant in a criminal case once the defendant pleads guilty or is found guilty**. They do not include fines or restitution ordered by the judge to be paid by the defendant. This means that this waiver may not apply to some court costs and fees associated with your case.
 
@@ -239,7 +239,7 @@ subquestion: |
   
   **Note:** In criminal cases you must file an Application for Waiver of Criminal Court Assessments **no later than 30 days after the sentencing date**. You are responsible for knowing if there are other deadlines to file the documents.
   
-  To learn more, read the instructions you can download at the end of this program. 
+  To learn more, download and read the instructions at the end of this program. 
 ---
 template: get_legal_help
 subject: |
@@ -281,7 +281,7 @@ subquestion: |
   Check any benefits that ${ users[0].familiar() } currently receives.
   % endif
 
-  **Note:** Medicaid works differently than these benefits. If ${you_or_they} are on Medicaid and want to include this in ${your_or_their} Assessments waiver application, you can explain it on another screen.
+  **Note:** Medicaid works differently than these benefits. If ${you_or_obo_name} are on Medicaid and ${"want" if filing_basis == "filing_self" else "wants"} to include this in ${your_or_their} Assessments waiver application, you can explain it elsewhere. Look for the **Other reasons why paying assessments would be hard** screen.  
 fields:
   - no label: user_benefits
     datatype: checkboxes
@@ -316,7 +316,7 @@ subquestion: |
   * SNAP - Supplemental Nutrition Assitance Program (Food Stamps)
   * General Assistance Program (GA), Transitional Assistance, or State Children and Family Assistance
 
-  **Note:** Medicaid works differently than these benefits. If ${you_or_they} are on Medicaid and want to include this in ${your_or_their} Assessments waiver application, you can explain it on another screen.
+  **Note:** Medicaid works differently than these benefits. If ${you_or_obo_name} applied for Medicaid and ${"want" if filing_basis == "filing_self" else "wants"} to include this in ${your_or_their} Assessments waiver application, you can explain it elsewhere. Look for the **Other reasons why paying assessments would be hard** screen.
 fields:
   - no label: user_applied_for_benefits
     datatype: yesnoradio
@@ -404,9 +404,9 @@ question: |
   % endif
 subquestion: |
   % if filing_basis == "filing_self": 
-  Because you currently receive public benefits, you should qualify for 100% waiver of court assessments for your case.
+  Because you currently receive public benefits, you should qualify to have all court assessments waived for this case.
   % else:
-  Because ${ users[0].familiar() } currently receives public benefits, they should qualify for a 100% waiver of court assessments in this case.
+  Because ${ users[0].familiar() } currently receives public benefits, they should qualify to have all court assessments waived for this case.
   % endif
 ---
 id: How many dependents do you have
@@ -1467,8 +1467,7 @@ content: |
   assets and expenses. They will also read any additional explanation that you
   decide to provide.
   
-  Some of ${ your_or_their } assets will not be counted. For example: the value of ${ your_or_their } car,
-  up to $3,600, is not counted. A person can have up to $4,000 in other assets,
+  Some of ${ your_or_their } assets will not be counted. For example, up to $3,600 of the value of ${ your_or_their } car is not counted. A person can have up to $4,000 in other assets,
   such as bank accounts, that are not counted. The assets that are not
   counted are set by law: specifically, 
   [**735 ILCS 5/12-901**](https://www.ilga.gov/legislation/ilcs/fulltext.asp?DocName=073500050K12-1001)
@@ -1560,21 +1559,19 @@ content: |
 id: substantial hardship
 question: |
   % if filing_basis == "filing_self":
-  Will paying assessments be hard for you or your family?
+  Other reasons why paying assessments would be hard for you or your family
   % else:
-  Will paying assessments be hard for ${ users[0].familiar() } or their family?
+  Other reasons why paying assessments would be hard for ${ users[0].familiar() } or their family
   % endif
 subquestion: |
   % if filing_basis == "filing_self":
-  If you want to explain to a judge why you would be harmed if you do not
-  get an assessments waiver, you can explain it here. This is optional.
+  If there is additional information you think the judge should know about why you cannot afford to pay the assessments, include that information here. This is optional.  
   
   Complete this sentence:
   
   **It would be a substantial hardship for me or my family if I have to pay the assessments because:**
   % else:
-  If you want to explain to the judge why ${ users[0].familiar() } would be 
-  harmed if they do not get an assessments waiver, you can explain it here. This is optional.
+  If there is additional information you think the judge should know about why ${ users[0].familiar() } cannot afford to pay the assessments, include that information here. This is optional.
   
   Complete this sentence:
   
@@ -1648,12 +1645,12 @@ question: |
   % endif
 subquestion: |
   % if al_form_type in ['starts_case','existing_case','appeal'] and user_started_case:
-  Answer yes if there is a person or organization ${ you_or_obo_name } ${ are_is } suing or taking to court.
+  Answer **Yes** if there is a person or organization ${ you_or_obo_name } ${ are_is } suing or taking to court.
   % elif al_form_type in ['starts_case','existing_case','appeal']:
   You should be able to find out from the paperwork that told ${ you_or_obo_name } to 
   go to court.
 
-  Answer yes if someone else has sued ${ you_or_obo_name } or is bringing ${ you_or_obo_name } to court.
+  Answer **Yes** if someone else has sued ${ you_or_obo_name } or is bringing ${ you_or_obo_name } to court.
   % endif
 fields:
   - no label: other_parties.there_are_any
@@ -3382,10 +3379,12 @@ review:
     show if: filing_basis == "filing_self"
   - Edit: substantial_hardship_explanation
     button: |
-      **Substantial hardship because**:
+      % if filing_basis != "filing_self":
+      **${ users[0].name_full() } cannot afford to pay assessments because:**
+      % else:
+      **Cannot afford to pay assessments because:**
+      % endif
       ${ substantial_hardship_explanation }
-
-
       
 #  - Edit: hide_address
 #    button: |
@@ -4074,7 +4073,11 @@ review:
     show if: filing_basis != "filing_self"
   - Edit: substantial_hardship_explanation
     button: |
-      **Substantial hardship because**:
+      % if filing_basis != "filing_self":
+      **${ users[0].name_full() } cannot afford to pay assessments because:**
+      % else:
+      **Cannot afford to pay assessments because:**
+      % endif
       ${ substantial_hardship_explanation }
   - Edit: user_has_dependents
     button: |
